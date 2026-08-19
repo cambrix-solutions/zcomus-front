@@ -1,25 +1,26 @@
-// Quasar SCSS (& Sass) Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
+// Zcomus / Ecom Home-2 inspired tokens
+$primary   : #FD9636; // Ecom brand-2
+$secondary : #425A8B;
+$accent    : #0BA9ED;
 
-// Check documentation for full list of Quasar variables
+$dark      : #0E224D;
+$dark-page : #0E224D;
 
-// Your own variables (that are declared here) and Quasar's own
-// ones will be available out of the box in your .vue/.scss/.sass files
+$positive  : #5BC694;
+$negative  : #F53658;
+$info      : #27B3D2;
+$warning   : #FFB067;
 
-// It's highly recommended to change the default colors
-// to match your app's branding.
-// Tip: Use the "Theme Builder" on Quasar's documentation website.
-
-$primary   : #1976D2;
-$secondary : #26A69A;
-$accent    : #9C27B0;
-
-$dark      : #1D1D1D;
-$dark-page : #121212;
-
-$positive  : #21BA45;
-$negative  : #C10015;
-$info      : #31CCEC;
-$warning   : #F2C037;
+// Custom (available in app SCSS)
+$brand-1: #0BA9ED;
+$brand-2: #FD9636;
+$brand-3: #425A8B;
+$brand-4: #D36B0B;
+$gray-50: #F0F3F8;
+$gray-100: #DDE4F0;
+$gray-200: #CAD6EC;
+$gray-500: #8C9EC5;
+$gray-900: #425A8B;
+$gray-1000: #0E224D;
+$font-body: 'DM Sans', sans-serif;
+$font-display: 'Kanit', sans-serif;
