@@ -58,6 +58,10 @@ jobs:
             ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           fi
           chmod 644 ~/.ssh/known_hosts
+          # Fingerprints are not secret. Printing it makes an SSH_KEY mismatch
+          # obvious: compare against `ssh-keygen -lf` of the server's public key.
+          ssh-keygen -lf ~/.ssh/id_deploy \
+            || { echo "FATAL: SSH_KEY is not a valid private key (check for lost newlines)"; exit 1; }
 
       # Writes directly into the folder nginx already serves
       # (root /www/wwwroot/zcomus-front/dist/pwa). No server config is touched.
@@ -71,7 +75,10 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
+          # BatchMode stops ssh falling back to a password prompt, which would
+          # otherwise bury the real "publickey rejected" cause in retry noise.
           SSH_OPTS="-i $HOME/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes"
+          SSH_OPTS="$SSH_OPTS -o BatchMode=yes -o IdentitiesOnly=yes -o PreferredAuthentications=publickey"
           TARGET="$DEPLOY_PATH/dist/pwa"
 
           ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" "mkdir -p '$TARGET'"
