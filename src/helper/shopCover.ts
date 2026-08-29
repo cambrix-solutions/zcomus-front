@@ -8,7 +8,8 @@ export const DEFAULT_SHOP_COVER =
       '</linearGradient></defs><rect width="1200" height="420" fill="url(#g)"/></svg>',
   );
 
-const LEGACY_COVER_SUFFIX = 'imgs/page/vendor/featured.png';
+/** Matches the old stock cover regardless of extension — covers persisted before the WebP switch. */
+const LEGACY_COVER_SUFFIX = 'imgs/page/vendor/featured.';
 
 export function isLegacyDefaultCover(cover: string): boolean {
   return !cover || cover.includes(LEGACY_COVER_SUFFIX);

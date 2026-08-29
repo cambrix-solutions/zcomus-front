@@ -92,7 +92,7 @@ const post = computed(() => {
       date: '',
       excerpt: '',
       body: '',
-      image: ecom('imgs/page/blog/blog-1.jpg'),
+      image: ecom('imgs/page/blog/blog-1.webp'),
       category: 'Guides',
       minutes: 3,
       author: 'Zcomus Team',

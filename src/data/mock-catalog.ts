@@ -50,30 +50,30 @@ export interface Product {
 }
 
 export const mockCategories: Category[] = [
-  { id: 1, name: 'Air Purifier', slug: 'air-purifier', image: ecom('imgs/page/homepage2/cat-img-1.png'), products_count: 1025 },
-  { id: 2, name: 'Women Bags', slug: 'women-bags', image: ecom('imgs/page/homepage2/cat-img-2.png'), products_count: 125 },
-  { id: 3, name: 'Bluetooth', slug: 'bluetooth', image: ecom('imgs/page/homepage2/cat-img-3.png'), products_count: 625 },
-  { id: 4, name: 'Electronic', slug: 'electronic', image: ecom('imgs/page/homepage2/cat-img-4.png'), products_count: 1025 },
-  { id: 5, name: 'Gaming Gear', slug: 'gaming-gear', image: ecom('imgs/page/homepage2/cat-img-5.png'), products_count: 1025 },
-  { id: 6, name: 'Gaming Chair', slug: 'gaming-chair', image: ecom('imgs/page/homepage2/cat-img-6.png'), products_count: 1025 },
-  { id: 7, name: 'Home App', slug: 'home-app', image: ecom('imgs/page/homepage2/cat-img-7.png'), products_count: 1025 },
-  { id: 8, name: 'Kitchen', slug: 'kitchen', image: ecom('imgs/page/homepage2/cat-img-8.png'), products_count: 1025 },
-  { id: 9, name: 'Mobile Gadgets', slug: 'mobile-gadgets', image: ecom('imgs/page/homepage2/cat-img-9.png'), products_count: 1025 },
-  { id: 10, name: 'Smart watches', slug: 'smart-watches', image: ecom('imgs/page/homepage2/cat-img-1.png'), products_count: 89 },
-  { id: 11, name: 'Cell Phones', slug: 'cell-phones', image: ecom('imgs/page/homepage2/cat-img-3.png'), products_count: 23 },
-  { id: 12, name: 'Headphone', slug: 'headphone', image: ecom('imgs/page/homepage2/cat-img-5.png'), products_count: 98 },
+  { id: 1, name: 'Air Purifier', slug: 'air-purifier', image: ecom('imgs/page/homepage2/cat-img-1.webp'), products_count: 1025 },
+  { id: 2, name: 'Women Bags', slug: 'women-bags', image: ecom('imgs/page/homepage2/cat-img-2.webp'), products_count: 125 },
+  { id: 3, name: 'Bluetooth', slug: 'bluetooth', image: ecom('imgs/page/homepage2/cat-img-3.webp'), products_count: 625 },
+  { id: 4, name: 'Electronic', slug: 'electronic', image: ecom('imgs/page/homepage2/cat-img-4.webp'), products_count: 1025 },
+  { id: 5, name: 'Gaming Gear', slug: 'gaming-gear', image: ecom('imgs/page/homepage2/cat-img-5.webp'), products_count: 1025 },
+  { id: 6, name: 'Gaming Chair', slug: 'gaming-chair', image: ecom('imgs/page/homepage2/cat-img-6.webp'), products_count: 1025 },
+  { id: 7, name: 'Home App', slug: 'home-app', image: ecom('imgs/page/homepage2/cat-img-7.webp'), products_count: 1025 },
+  { id: 8, name: 'Kitchen', slug: 'kitchen', image: ecom('imgs/page/homepage2/cat-img-8.webp'), products_count: 1025 },
+  { id: 9, name: 'Mobile Gadgets', slug: 'mobile-gadgets', image: ecom('imgs/page/homepage2/cat-img-9.webp'), products_count: 1025 },
+  { id: 10, name: 'Smart watches', slug: 'smart-watches', image: ecom('imgs/page/homepage2/cat-img-1.webp'), products_count: 89 },
+  { id: 11, name: 'Cell Phones', slug: 'cell-phones', image: ecom('imgs/page/homepage2/cat-img-3.webp'), products_count: 23 },
+  { id: 12, name: 'Headphone', slug: 'headphone', image: ecom('imgs/page/homepage2/cat-img-5.webp'), products_count: 98 },
 ];
 
 /** Assets matched to real product photos in the Ecom pack */
 const img = {
-  watchSilver: ecom('imgs/page/homepage1/imgsp2.png'),
-  surfaceStudio: ecom('imgs/page/homepage1/imgsp3.png'),
-  headphonesBo: ecom('imgs/page/homepage1/imgsp4.png'),
-  laptop: ecom('imgs/page/homepage1/imgsp5.png'),
-  watchWhite: ecom('imgs/page/homepage1/imgsp6.png'),
-  camera360: ecom('imgs/page/homepage2/camera.png'),
-  airpods: ecom('imgs/page/homepage2/airpod.png'),
-  fitnessWatch: ecom('imgs/page/homepage2/clock.png'),
+  watchSilver: ecom('imgs/page/homepage1/imgsp2.webp'),
+  surfaceStudio: ecom('imgs/page/homepage1/imgsp3.webp'),
+  headphonesBo: ecom('imgs/page/homepage1/imgsp4.webp'),
+  laptop: ecom('imgs/page/homepage1/imgsp5.webp'),
+  watchWhite: ecom('imgs/page/homepage1/imgsp6.webp'),
+  camera360: ecom('imgs/page/homepage2/camera.webp'),
+  airpods: ecom('imgs/page/homepage2/airpod.webp'),
+  fitnessWatch: ecom('imgs/page/homepage2/clock.webp'),
 };
 
 export const mockProducts: Product[] = [

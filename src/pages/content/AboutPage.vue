@@ -47,7 +47,7 @@ import ContentPageShell from 'components/store/ContentPageShell.vue';
 import { ecom } from 'src/helper/ecomAssets';
 
 const { t } = useI18n();
-const aboutImg = ecom('imgs/page/about/img.png');
+const aboutImg = ecom('imgs/page/about/img.webp');
 const stats = [
   { title: '12 Years', text: 'Serving Cambodian shoppers.' },
   { title: '200+ Vendors', text: 'Sellers across Phnom Penh and the provinces.' },
@@ -55,9 +55,9 @@ const stats = [
   { title: 'Phnom Penh HQ', text: 'Office and warehouse in Phnom Penh.' },
 ];
 const team = [
-  { name: 'Ronald Richards', role: 'Chief Executive Officer', image: ecom('imgs/page/about/staft1.png') },
-  { name: 'Jenny Wilson', role: 'Chief Financial Officer', image: ecom('imgs/page/about/staft2.png') },
-  { name: 'Cody Fisher', role: 'Chief Operating Officer', image: ecom('imgs/page/about/staft3.png') },
-  { name: 'Jacob Jones', role: 'Chief Technology Officer', image: ecom('imgs/page/about/staft4.png') },
+  { name: 'Ronald Richards', role: 'Chief Executive Officer', image: ecom('imgs/page/about/staft1.webp') },
+  { name: 'Jenny Wilson', role: 'Chief Financial Officer', image: ecom('imgs/page/about/staft2.webp') },
+  { name: 'Cody Fisher', role: 'Chief Operating Officer', image: ecom('imgs/page/about/staft3.webp') },
+  { name: 'Jacob Jones', role: 'Chief Technology Officer', image: ecom('imgs/page/about/staft4.webp') },
 ];
 </script>

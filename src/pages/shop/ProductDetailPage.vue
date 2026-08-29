@@ -230,11 +230,11 @@ const { currentProduct, products } = storeToRefs(catalog);
 const product = computed(() => currentProduct.value);
 
 const legacyGalleryAssets = [
-  ecom('imgs/page/product/img-gallery-1.jpg'),
-  ecom('imgs/page/product/img-gallery-2.jpg'),
-  ecom('imgs/page/product/img-gallery-3.jpg'),
-  ecom('imgs/page/product/img-gallery-4.jpg'),
-  ecom('imgs/page/product/img-gallery-5.jpg'),
+  ecom('imgs/page/product/img-gallery-1.webp'),
+  ecom('imgs/page/product/img-gallery-2.webp'),
+  ecom('imgs/page/product/img-gallery-3.webp'),
+  ecom('imgs/page/product/img-gallery-4.webp'),
+  ecom('imgs/page/product/img-gallery-5.webp'),
 ];
 
 const gallery = computed(() => {

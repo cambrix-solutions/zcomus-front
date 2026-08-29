@@ -25,7 +25,7 @@
 import ContentPageShell from 'components/store/ContentPageShell.vue';
 import { ecom } from 'src/helper/ecomAssets';
 
-const hero = ecom('imgs/page/about/team-2.jpg');
+const hero = ecom('imgs/page/about/team-2.webp');
 const jobs = [
   { title: 'Frontend Engineer', meta: 'Phnom Penh · Full-time', blurb: 'Vue, Quasar, storefront UI.' },
   { title: 'Marketplace Operations', meta: 'Phnom Penh · Full-time', blurb: 'Partner with vendors and keep fulfillment smooth.' },
