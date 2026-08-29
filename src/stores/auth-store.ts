@@ -6,7 +6,7 @@ import {
   getApiErrorMessage,
   type ApiEnvelope,
 } from 'src/helper/api/apiClient';
-import { endpoints } from 'src/helper/api/apiConfig';
+import { endpoints, isApiEnabled } from 'src/helper/api/apiConfig';
 import {
   homePathForRole,
   isAdminRole,
@@ -139,6 +139,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUser() {
+    // With no backend the session lives only in localStorage, so revalidating
+    // would clear it on every reload. Trust what is already stored.
+    if (!isApiEnabled()) return user.value;
+
     try {
       const res = await apiRequest<AuthUser>(endpoints.user);
       persist(pickUser(res));

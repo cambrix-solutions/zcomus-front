@@ -1,7 +1,11 @@
 import { onMounted, ref } from 'vue';
 
-/** Shows a short boot/skeleton window even when data resolves instantly. */
-export function useBootLoad(loader?: () => Promise<unknown>, minMs = 400) {
+/**
+ * Skeleton window while `loader` runs. `minMs` can hold the skeleton open a
+ * little longer to avoid a flash, but defaults to 0 — a deliberate delay is
+ * indistinguishable from a slow site.
+ */
+export function useBootLoad(loader?: () => Promise<unknown>, minMs = 0) {
   const booting = ref(true);
 
   onMounted(async () => {

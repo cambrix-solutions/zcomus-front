@@ -395,10 +395,7 @@ function onQuickview(product: Product) {
   ui.openQuickview(product);
 }
 onMounted(async () => {
-  const started = Date.now();
   await catalog.loadHomeCatalog();
-  const wait = Math.max(0, 400 - (Date.now() - started));
-  if (wait) await new Promise((r) => setTimeout(r, wait));
   booting.value = false;
 });
 </script>

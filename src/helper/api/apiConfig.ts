@@ -26,6 +26,17 @@ export function getApiConfig(): ApiEndpointConfig {
   return API_CONFIG[resolveAppMode()];
 }
 
+/**
+ * Master switch for backend traffic. While no Laravel API exists, every request
+ * would just stall until it times out, so the app runs entirely on the Pinia
+ * stores and their mock data instead. Set `VITE_USE_API=true` to turn the
+ * network back on once the backend is live.
+ */
+export function isApiEnabled(): boolean {
+  const raw = import.meta.env.VITE_USE_API;
+  return raw === 'true' || raw === '1';
+}
+
 /** Backend base URL (no trailing slash). Optional VITE_API_URL overrides mode config. */
 export function getApiBaseUrl(): string {
   const override = import.meta.env.VITE_API_URL?.replace(/\/$/, '');

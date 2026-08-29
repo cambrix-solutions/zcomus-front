@@ -94,7 +94,9 @@ export const useCatalogStore = defineStore('catalog', () => {
     error.value = null;
     try {
       try {
-        const payload = await apiRequest<Product>(endpoints.product(idOrSlug));
+        const payload = await apiRequest<Product>(endpoints.product(idOrSlug), {
+          timeoutMs: FAST_TIMEOUT_MS,
+        });
         const product = unwrapData(payload);
         if (product?.id) {
           currentProduct.value = product;
@@ -125,20 +127,30 @@ export const useCatalogStore = defineStore('catalog', () => {
     }
   }
 
+  /**
+   * Paints the local catalogue immediately, then refreshes from the API in the
+   * background. Awaiting the network first meant an unreachable backend held
+   * static data hostage behind a connection timeout, so the homepage sat on
+   * skeletons for seconds with content already in memory. Resolves as soon as
+   * something is renderable; real data swaps in when (and if) it lands.
+   */
   async function loadHomeCatalog() {
-    loading.value = true;
     error.value = null;
-    try {
-      await Promise.all([fetchCategories(), fetchProducts()]);
-      if (!categories.value.length || !baseProducts.value.length) {
-        applyMockCatalog();
-      }
-    } catch (e: unknown) {
-      error.value = getApiErrorMessage(e, 'Failed to load catalog');
+
+    if (!categories.value.length || !baseProducts.value.length) {
       applyMockCatalog();
-    } finally {
-      loading.value = false;
     }
+
+    loading.value = true;
+    void Promise.all([fetchCategories(), fetchProducts()])
+      .catch((e: unknown) => {
+        error.value = getApiErrorMessage(e, 'Failed to load catalog');
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+
+    return Promise.resolve();
   }
 
   return {

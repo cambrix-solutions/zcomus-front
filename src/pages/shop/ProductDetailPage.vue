@@ -447,12 +447,9 @@ function syncSelections() {
 
 async function load() {
   booting.value = true;
-  const started = Date.now();
   await catalog.fetchProduct(String(route.params.slug));
   if (!products.value.length) await catalog.fetchProducts();
   syncSelections();
-  const wait = Math.max(0, 350 - (Date.now() - started));
-  if (wait) await new Promise((r) => setTimeout(r, wait));
   booting.value = false;
 }
 function selectColor(c: { name: string; disabled?: boolean; imageIndex?: number; fallbackIndex?: number }) {

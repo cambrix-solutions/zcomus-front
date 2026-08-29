@@ -1,4 +1,16 @@
-import { endpoints, getApiBaseUrl } from 'src/helper/api/apiConfig';
+import { endpoints, getApiBaseUrl, isApiEnabled } from 'src/helper/api/apiConfig';
+
+/**
+ * Thrown instead of making a request while `VITE_USE_API` is off. Callers that
+ * already fall back to mock data need no changes; those that must distinguish
+ * "no backend" from "backend said no" can check for this type.
+ */
+export class ApiDisabledError extends Error {
+  constructor() {
+    super('API is disabled (VITE_USE_API is not enabled)');
+    this.name = 'ApiDisabledError';
+  }
+}
 
 export interface ApiEnvelope<T = unknown> {
   status?: boolean;
@@ -48,6 +60,7 @@ export function resolveApiUrl(): string {
 }
 
 export async function ensureCsrf(): Promise<void> {
+  if (!isApiEnabled()) return;
   const base = resolveApiUrl();
   const { signal, done } = withTimeout(DEFAULT_TIMEOUT_MS);
   try {
@@ -75,6 +88,9 @@ export async function apiRequest<T = unknown>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<ApiEnvelope<T>> {
+  // Rejects synchronously, so mock fallbacks render on the first frame.
+  if (!isApiEnabled()) throw new ApiDisabledError();
+
   const url = new URL(path.replace(/^\//, ''), `${resolveApiUrl()}/`);
 
   Object.entries(options.params || {}).forEach(([key, value]) => {

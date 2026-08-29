@@ -81,11 +81,7 @@ function onQuickview(product: Product) {
 }
 
 onMounted(async () => {
-  const started = Date.now();
   await catalog.loadHomeCatalog();
-  // Keep skeleton visible briefly so the load state is noticeable
-  const wait = Math.max(0, 450 - (Date.now() - started));
-  if (wait) await new Promise((r) => setTimeout(r, wait));
   booting.value = false;
 });
 </script>
