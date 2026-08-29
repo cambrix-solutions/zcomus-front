@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= productName %></title>
 
@@ -9,14 +9,71 @@
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>">
 
+    <meta name="theme-color" content="#A6704D">
+    <meta name="application-name" content="Zcomus">
+    <meta name="apple-mobile-web-app-title" content="Zcomus">
+    <link rel="canonical" href="https://zcomus.site/">
+
+    <!-- Open Graph / Twitter defaults; the SPA overwrites these per route -->
+    <meta property="og:site_name" content="Zcomus">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= productName %>">
+    <meta property="og:description" content="<%= productDescription %>">
+    <meta property="og:url" content="https://zcomus.site/">
+    <meta property="og:image" content="https://zcomus.site/brand/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="km_KH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= productName %>">
+    <meta name="twitter:description" content="<%= productDescription %>">
+    <meta name="twitter:image" content="https://zcomus.site/brand/og-image.png">
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
     <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="icon" type="image/ico" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
+    <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#A6704D">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://zcomus.site/#organization",
+            "name": "Zcomus",
+            "url": "https://zcomus.site/",
+            "logo": "https://zcomus.site/icons/icon-512x512.png",
+            "areaServed": { "@type": "Country", "name": "Cambodia" }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://zcomus.site/#website",
+            "name": "Zcomus",
+            "url": "https://zcomus.site/",
+            "inLanguage": ["en", "km"],
+            "publisher": { "@id": "https://zcomus.site/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://zcomus.site/shop?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <!-- quasar:entry-point -->

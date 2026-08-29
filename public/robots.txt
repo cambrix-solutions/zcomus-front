@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Private / transactional areas — no search value
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /wishlist
+Disallow: /compare
+Disallow: /login
+Disallow: /register
+Disallow: /vendor
+Disallow: /seller
+Disallow: /admin
+
+# Avoid indexing filtered and paginated duplicates of the catalogue
+Disallow: /shop?*
+
+Sitemap: https://zcomus.site/sitemap.xml

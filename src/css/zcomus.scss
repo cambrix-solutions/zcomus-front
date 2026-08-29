@@ -5689,18 +5689,6 @@ ol {
   text-decoration: none;
 }
 
-.z-logo__mark {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--z-primary);
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 900;
-}
-
 .z-logo__text {
   font-size: 1.35rem;
   font-weight: 800;
@@ -9418,12 +9406,6 @@ ol {
 
   .z-logo__text {
     font-size: 1.2rem;
-  }
-
-  .z-logo__mark {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
   }
 
   .z-search {

@@ -2,6 +2,7 @@ import { defineBoot } from '#q-app/wrappers';
 import { createI18n } from 'vue-i18n';
 
 import messages from 'src/i18n';
+import { setSeoTranslator } from 'src/helper/seo';
 import { applySiteFont } from 'stores/prefs-store';
 
 export type MessageLanguages = keyof typeof messages;
@@ -35,5 +36,6 @@ export default defineBoot(({ app }) => {
 
   document.documentElement.lang = locale === 'km' ? 'km' : 'en';
   applySiteFont(locale === 'km' ? 'km' : 'en-US');
+  setSeoTranslator((key) => i18n.global.t(key));
   app.use(i18n);
 });

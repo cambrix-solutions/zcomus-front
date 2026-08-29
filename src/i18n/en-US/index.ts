@@ -2,6 +2,47 @@ export default {
   failed: 'Action failed',
   success: 'Action was successful',
   brand: 'Zcomus',
+  seo: {
+    home: {
+      title: 'Zcomus — Cambodia’s online marketplace',
+      desc: 'Shop electronics, fashion, groceries and more from trusted Cambodian vendors. Pay with KHQR, ABA, Wing or cash on delivery, with fast delivery nationwide.',
+    },
+    shop: {
+      title: 'Shop all products',
+      desc: 'Browse every product on Zcomus. Filter by category, brand and price, and buy from verified vendors across Cambodia.',
+    },
+    product: { title: 'Product', desc: 'Product details, pricing and delivery options on Zcomus.' },
+    vendors: {
+      title: 'Vendors',
+      desc: 'Discover shops and sellers on Zcomus. Follow your favourite Cambodian vendors and shop their full catalogue.',
+    },
+    vendor: { title: 'Vendor shop', desc: 'Browse this vendor’s products on Zcomus.' },
+    blog: {
+      title: 'Blog',
+      desc: 'Shopping guides, vendor stories and marketplace news from the Zcomus team.',
+    },
+    blogSingle: { title: 'Article', desc: 'Read the latest from the Zcomus blog.' },
+    about: {
+      title: 'About us',
+      desc: 'Zcomus is a Cambodian online marketplace connecting local vendors with shoppers nationwide.',
+    },
+    contact: {
+      title: 'Contact',
+      desc: 'Get in touch with the Zcomus team for support, partnerships or vendor enquiries.',
+    },
+    careers: { title: 'Careers', desc: 'Open roles and life at Zcomus in Phnom Penh.' },
+    terms: { title: 'Terms & conditions', desc: 'Terms of use for the Zcomus marketplace.' },
+    cart: { title: 'Your cart', desc: 'Review the items in your Zcomus cart.' },
+    checkout: { title: 'Checkout', desc: 'Complete your Zcomus order.' },
+    wishlist: { title: 'Wishlist', desc: 'Products you saved on Zcomus.' },
+    compare: { title: 'Compare products', desc: 'Compare products side by side on Zcomus.' },
+    login: { title: 'Sign in', desc: 'Sign in to your Zcomus account.' },
+    register: { title: 'Create an account', desc: 'Create a free Zcomus account.' },
+    account: { title: 'My account', desc: 'Manage your Zcomus orders, addresses and profile.' },
+    vendorCenter: { title: 'Vendor Center', desc: 'Manage your shop, listings and payouts.' },
+    admin: { title: 'Admin Center', desc: 'Platform administration.' },
+    notFound: { title: 'Page not found', desc: 'The page you are looking for does not exist.' },
+  },
   nav: {
     home: 'Home',
     shop: 'Shop',

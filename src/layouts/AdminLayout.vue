@@ -4,7 +4,7 @@
 
     <aside class="z-ahub__sidebar">
       <router-link class="z-ahub__brand" to="/admin" @click="mobileNavOpen = false">
-        <span class="z-ahub__brand-mark">Z</span>
+        <span class="z-ahub__brand-mark"><ZcomusMark :size="24" mono /></span>
         <div>
           <strong>Zcomus</strong>
           <small>{{ t('admin.center') }}</small>
@@ -87,6 +87,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { Notify } from 'quasar';
+import ZcomusMark from 'components/brand/ZcomusMark.vue';
 import { useAuthStore } from 'stores/auth-store';
 
 const { t } = useI18n();

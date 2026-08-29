@@ -7,7 +7,7 @@
 
     <aside v-if="shop.active" class="z-vhub__sidebar">
       <router-link class="z-vhub__brand" to="/vendor" @click="onNav('dashboard')">
-        <span class="z-vhub__brand-mark">Z</span>
+        <span class="z-vhub__brand-mark"><ZcomusMark :size="24" mono /></span>
         <div>
           <strong>Zcomus</strong>
           <small>{{ t('seller.center') }}</small>
@@ -67,7 +67,7 @@
         </button>
 
         <router-link v-else class="z-vhub__brand z-vhub__brand--compact" to="/">
-          <span class="z-vhub__brand-mark">Z</span>
+          <span class="z-vhub__brand-mark"><ZcomusMark :size="24" mono /></span>
           <strong>Zcomus</strong>
         </router-link>
 
@@ -107,6 +107,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Notify } from 'quasar';
 import SellerListingDialog from 'components/seller/SellerListingDialog.vue';
+import ZcomusMark from 'components/brand/ZcomusMark.vue';
 import { useSellerShop } from 'src/composables/useSellerShop';
 import { useSellerUi, type SellerPanelId } from 'src/composables/useSellerUi';
 import { useAuthStore } from 'stores/auth-store';

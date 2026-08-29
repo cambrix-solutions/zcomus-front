@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Zcomus">
+  <title>Zcomus</title>
+  <!-- Arrow omitted on purpose: below ~48px it muddies the Z. Use for favicons. -->
+  <path d="M24 26v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#A6704D" stroke-width="3" stroke-linecap="round"/>
+  <path d="M16.5 26h31l2.4 29.6a2.8 2.8 0 0 1-2.8 3.04H16.9a2.8 2.8 0 0 1-2.8-3.04z" fill="#A6704D"/>
+  <path d="M24 33h16v4.6l-8.7 8.2H40V51H24v-4.6l8.7-8.2H24z" fill="#F9F7F2"/>
+</svg>

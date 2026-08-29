@@ -29,8 +29,8 @@
           <i class="material-icons">menu</i>
         </button>
 
-        <router-link class="z-logo" to="/">
-          <span class="z-logo__mark">Z</span>
+        <router-link class="z-logo" to="/" :aria-label="t('brand')">
+          <ZcomusMark :size="40" />
           <span class="z-logo__text">{{ t('brand') }}</span>
         </router-link>
 
@@ -106,8 +106,8 @@
         <div class="z-drawer__mask" @click="ui.mobileMenuOpen = false" />
         <aside class="z-drawer__panel" role="dialog" aria-modal="true" :aria-label="t('header.menu')">
           <div class="z-drawer__head">
-            <router-link class="z-logo" to="/" @click="ui.mobileMenuOpen = false">
-              <span class="z-logo__mark">Z</span>
+            <router-link class="z-logo" to="/" :aria-label="t('brand')" @click="ui.mobileMenuOpen = false">
+              <ZcomusMark :size="36" />
               <span class="z-logo__text">{{ t('brand') }}</span>
             </router-link>
             <button class="z-drawer__close" type="button" :aria-label="t('header.close')" @click="ui.mobileMenuOpen = false">
@@ -178,6 +178,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import PriceDisplay from 'components/store/PriceDisplay.vue';
+import ZcomusMark from 'components/brand/ZcomusMark.vue';
 import { useCartStore } from 'stores/cart-store';
 import { useAuthStore } from 'stores/auth-store';
 import { useCatalogStore } from 'stores/catalog-store';

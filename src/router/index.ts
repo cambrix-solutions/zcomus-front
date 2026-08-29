@@ -7,6 +7,7 @@ import {
   type RouteLocationNormalized,
 } from 'vue-router';
 import { isAdminRole } from 'src/helper/authRoles';
+import { applyRouteSeo } from 'src/helper/seo';
 import { useAuthStore } from 'stores/auth-store';
 import routes from './routes';
 
@@ -52,6 +53,10 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     }
 
     return true;
+  });
+
+  Router.afterEach((to) => {
+    applyRouteSeo(to);
   });
 
   return Router;

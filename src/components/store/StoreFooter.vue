@@ -12,8 +12,8 @@
       <div class="z-footer__grid">
         <div>
           <div class="z-footer__brand">
-            <router-link class="z-logo" to="/">
-              <span class="z-logo__mark">Z</span>
+            <router-link class="z-logo" to="/" :aria-label="t('brand')">
+              <ZcomusMark :size="40" />
               <span class="z-logo__text">{{ t('brand') }}</span>
             </router-link>
           </div>
@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import ZcomusMark from 'components/brand/ZcomusMark.vue';
 
 const { t } = useI18n();
 const year = new Date().getFullYear();

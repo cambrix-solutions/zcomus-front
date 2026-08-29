@@ -1,7 +1,7 @@
 {
-  "name": "quasar-project",
+  "name": "zcomus-front",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "Shop electronics, fashion, groceries and more from trusted Cambodian vendors, with delivery nationwide.",
   "productName": "Zcomus",
   "author": "roeunvireak <roeun.vireak@ibf.com.kh>",
   "type": "module",
