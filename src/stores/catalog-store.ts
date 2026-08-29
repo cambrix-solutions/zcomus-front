@@ -11,6 +11,7 @@ import { liveSellerProducts, mergeCatalogWithSeller } from 'src/data/seller-cata
 import { useSellerShop } from 'src/composables/useSellerShop';
 import {
   apiRequest,
+  FAST_TIMEOUT_MS,
   getApiErrorMessage,
   unwrapData,
   unwrapList,
@@ -46,7 +47,10 @@ export const useCatalogStore = defineStore('catalog', () => {
 
   async function fetchCategories() {
     try {
-      const payload = await apiRequest<Category[]>(endpoints.categories);
+      // Bounded tightly: the homepage blocks on this and mocks stand in for it.
+      const payload = await apiRequest<Category[]>(endpoints.categories, {
+        timeoutMs: FAST_TIMEOUT_MS,
+      });
       const list = unwrapList(payload);
       if (list.length) {
         categories.value = list;
@@ -65,10 +69,10 @@ export const useCatalogStore = defineStore('catalog', () => {
 
   async function fetchProducts(params?: Record<string, string>) {
     try {
-      const payload = await apiRequest<Product[]>(
-        endpoints.products,
-        params ? { params } : {},
-      );
+      const payload = await apiRequest<Product[]>(endpoints.products, {
+        timeoutMs: FAST_TIMEOUT_MS,
+        ...(params ? { params } : {}),
+      });
       const list = unwrapList(payload);
       if (list.length) {
         baseProducts.value = list;

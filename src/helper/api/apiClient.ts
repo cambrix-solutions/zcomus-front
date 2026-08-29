@@ -17,6 +17,30 @@ export interface ApiRequestOptions {
   body?: unknown;
   token?: string | null;
   credentials?: RequestCredentials;
+  /** Abort the request after this many ms. `0` disables the timeout. */
+  timeoutMs?: number;
+}
+
+/**
+ * `fetch` has no timeout of its own, so an unreachable backend stalls until the
+ * browser gives up — tens of seconds during which any screen waiting on the
+ * call just shows skeletons. Every request is bounded instead.
+ */
+const DEFAULT_TIMEOUT_MS = 10_000;
+
+/** Short bound for calls that have a mock fallback and block first paint. */
+export const FAST_TIMEOUT_MS = 3_500;
+
+function withTimeout(timeoutMs: number): {
+  signal: AbortSignal | undefined;
+  done: () => void;
+} {
+  if (timeoutMs <= 0 || typeof AbortController === 'undefined') {
+    return { signal: undefined, done: () => undefined };
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return { signal: controller.signal, done: () => clearTimeout(timer) };
 }
 
 export function resolveApiUrl(): string {
@@ -25,12 +49,21 @@ export function resolveApiUrl(): string {
 
 export async function ensureCsrf(): Promise<void> {
   const base = resolveApiUrl();
-  await fetch(`${base}${endpoints.csrfCookie}`, {
-    method: 'GET',
-    credentials: 'include',
-  }).catch(async () => {
-    await fetch(`${base}/`, { credentials: 'include' }).catch(() => undefined);
-  });
+  const { signal, done } = withTimeout(DEFAULT_TIMEOUT_MS);
+  try {
+    await fetch(`${base}${endpoints.csrfCookie}`, {
+      method: 'GET',
+      credentials: 'include',
+      ...(signal ? { signal } : {}),
+    }).catch(async () => {
+      await fetch(`${base}/`, {
+        credentials: 'include',
+        ...(signal ? { signal } : {}),
+      }).catch(() => undefined);
+    });
+  } finally {
+    done();
+  }
 }
 
 function readXsrfToken(): string | null {
@@ -83,7 +116,21 @@ export async function apiRequest<T = unknown>(
     requestInit.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(url.toString(), requestInit);
+  const { signal, done } = withTimeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  if (signal) requestInit.signal = signal;
+
+  let response: Response;
+  try {
+    response = await fetch(url.toString(), requestInit);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') {
+      throw new Error('Request timed out');
+    }
+    throw e;
+  } finally {
+    done();
+  }
+
   const payload = (await response.json().catch(() => ({}))) as ApiEnvelope<T>;
 
   if (!response.ok) {
