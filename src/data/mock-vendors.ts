@@ -1,5 +1,7 @@
 import { ecom } from 'src/helper/ecomAssets';
 
+export type StoreTheme = 'classic' | 'minimal' | 'bold';
+
 export interface Vendor {
   slug: string;
   name: string;
@@ -13,6 +15,12 @@ export interface Vendor {
   phone2?: string;
   industry: string;
   description: string;
+  tagline?: string;
+  accentColor?: string;
+  announcement?: string;
+  theme?: StoreTheme;
+  /** Set when loaded from the vendor's live shop profile. */
+  isLive?: boolean;
 }
 
 export const vendorIndustries = [

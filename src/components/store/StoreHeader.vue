@@ -1,279 +1,233 @@
 <template>
-  <header class="header sticky-bar" :class="{ stick: stuck }">
-    <div class="container">
-      <div class="main-header">
-        <div class="header-left">
-          <div class="header-logo">
-            <router-link class="d-flex" to="/">
-              <img alt="Zcomus" :src="ecom('imgs/template/logo.svg')" />
-            </router-link>
+  <header class="z-header" :class="{ 'is-scrolled': scrolled }">
+    <div class="z-header__utility d-none-xs">
+      <div class="z-container z-header__utility-row">
+        <div class="z-header__utility-links">
+          <router-link to="/about">{{ t('nav.about') }}</router-link>
+          <span>|</span>
+          <router-link to="/careers">{{ t('footer.careers') }}</router-link>
+          <span>|</span>
+          <router-link to="/vendor">{{ t('footer.openShop') }}</router-link>
+        </div>
+        <p class="z-header__utility-center">{{ t('trust.shipping') }}</p>
+        <div class="z-header__utility-right">
+          <p>{{ t('trust.help') }} <strong>{{ t('trust.phone') }}</strong></p>
+          <div class="z-header__prefs">
+            <button class="z-header__pref" :class="{ 'is-active': prefs.locale === 'en-US' }" type="button" @click="setLang('en-US')">EN</button>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.locale === 'km' }" type="button" @click="setLang('km')">ខ្មែរ</button>
+            <span class="z-header__sep">|</span>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.currency === 'USD' }" type="button" @click="prefs.setCurrency('USD')">USD</button>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.currency === 'KHR' }" type="button" @click="prefs.setCurrency('KHR')">៛</button>
           </div>
+        </div>
+      </div>
+    </div>
 
-          <div class="header-search d-none d-lg-block">
-            <div class="box-header-search">
-              <form class="form-search" @submit.prevent="onSearch">
-                <div class="box-category">
-                  <select v-model="category">
-                    <option value="all">All categories</option>
-                    <option v-for="c in catalog.categories" :key="c.id" :value="c.slug">
-                      {{ c.name }}
-                    </option>
-                  </select>
-                </div>
-                <div class="box-keysearch">
-                  <input
-                    v-model="query"
-                    class="form-control font-xs"
-                    type="text"
-                    placeholder="Search for items"
-                  />
-                </div>
-              </form>
-            </div>
+    <div class="z-header__main">
+      <div class="z-container z-header__row">
+        <button class="z-header__menu z-menu-btn" type="button" aria-label="Menu" @click="ui.mobileMenuOpen = true">
+          <i class="material-icons">menu</i>
+        </button>
+
+        <router-link class="z-logo" to="/">
+          <span class="z-logo__mark">Z</span>
+          <span class="z-logo__text">{{ t('brand') }}</span>
+        </router-link>
+
+        <form class="z-search z-search--main" @submit.prevent="onSearch">
+          <div class="z-search__field">
+            <i class="material-icons z-search__icon">search</i>
+            <select v-model="category" class="z-search__cat d-none-xs">
+              <option value="all">{{ t('header.all') }}</option>
+              <option v-for="c in catalog.categories" :key="c.id" :value="c.slug">
+                {{ c.name }}
+              </option>
+            </select>
+            <input v-model="query" type="search" :placeholder="t('header.search')" />
           </div>
+          <button class="z-search__btn" type="submit">{{ t('header.searchBtn') }}</button>
+        </form>
 
-          <div class="header-nav">
-            <nav class="nav-main-menu d-none d-xl-block">
-              <ul class="main-menu">
-                <li
-                  v-for="item in menu"
-                  :key="item.label"
-                  :class="{ 'has-children': item.children?.length }"
-                  @mouseenter="openMenu = item.label"
-                  @mouseleave="openMenu = null"
-                >
-                  <router-link
-                    v-if="item.to"
-                    :to="item.to"
-                    :class="{ active: isActive(item) }"
-                  >
-                    {{ item.label }}
-                  </router-link>
-                  <a
-                    v-else
-                    href="#"
-                    :class="{ active: openMenu === item.label }"
-                    @click.prevent="openMenu = openMenu === item.label ? null : item.label"
-                  >
-                    {{ item.label }}
-                  </a>
-                  <ul
-                    v-if="item.children?.length"
-                    class="sub-menu"
-                    :class="{ 'two-col': item.twoCol, 'is-open': openMenu === item.label }"
-                  >
-                    <li v-for="child in item.children" :key="child.to">
-                      <router-link :to="child.to" @click="openMenu = null">
-                        {{ child.label }}
-                      </router-link>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </nav>
-            <div
-              class="burger-icon burger-icon-white d-xl-none"
-              role="button"
-              tabindex="0"
-              @click="ui.mobileMenuOpen = true"
-              @keydown.enter="ui.mobileMenuOpen = true"
-            >
-              <span class="burger-icon-top" />
-              <span class="burger-icon-mid" />
-              <span class="burger-icon-bottom" />
-            </div>
-          </div>
+        <nav class="z-nav" :aria-label="t('header.mainNav')">
+          <router-link
+            v-for="item in mainNav"
+            :key="item.to"
+            :to="item.to"
+            class="z-nav__link"
+            :class="{ 'is-active': isNavActive(item.to) }"
+          >
+            {{ item.label }}
+          </router-link>
+        </nav>
 
-          <div class="header-shop">
+        <div class="z-header__acts">
+          <router-link class="z-header__action" :to="auth.user ? '/account' : '/login'">
+            <i class="material-icons">person_outline</i>
+            <span class="label">{{ t('nav.account') }}</span>
+          </router-link>
+          <router-link class="z-header__action" to="/wishlist">
+            <i class="material-icons">favorite_border</i>
+            <span class="label">{{ t('nav.wishlist') }}</span>
+            <span v-if="wishlist.count" class="z-header__badge">{{ wishlist.count }}</span>
+          </router-link>
+          <div class="z-header__cart-wrap" @mouseenter="cartOpen = true" @mouseleave="cartOpen = false">
             <router-link
-              class="font-lg icon-list icon-account"
-              :to="auth.user ? '/account' : '/login'"
+              class="z-header__action z-header__action--cart"
+              :class="{ 'is-pulse': ui.cartPulse }"
+              to="/cart"
             >
-              <span>{{ auth.user?.name || 'Account' }}</span>
+              <i class="material-icons">shopping_bag</i>
+              <span class="label">{{ t('nav.cart') }}</span>
+              <span v-if="cart.count" class="z-header__badge" :class="{ 'is-pulse': ui.cartPulse }">{{ cart.count }}</span>
             </router-link>
-
-            <router-link class="font-lg icon-list icon-wishlist" to="/wishlist">
-              <span>Wishlist</span>
-              <span class="number-item font-xs">{{ wishlist.count }}</span>
-            </router-link>
-
-            <div
-              class="d-inline-block box-dropdown-cart"
-              @mouseenter="cartOpen = true"
-              @mouseleave="cartOpen = false"
-            >
-              <router-link class="font-lg icon-list icon-cart" to="/cart">
-                <span>Cart</span>
-                <span class="number-item font-xs">{{ cart.count }}</span>
-              </router-link>
-              <div v-if="cartOpen && cart.items.length" class="dropdown-cart">
-                <div
-                  v-for="line in cart.items.slice(0, 3)"
-                  :key="line.product.id"
-                  class="item-cart mb-20"
-                >
-                  <div class="cart-image">
-                    <img :src="line.product.image" :alt="line.product.name" />
-                  </div>
-                  <div class="cart-info">
-                    <router-link
-                      class="font-sm-bold color-brand-3"
-                      :to="`/product/${line.product.slug}`"
-                    >
-                      {{ line.product.name }}
-                    </router-link>
-                    <p>
-                      <span class="color-brand-2 font-sm-bold">
-                        {{ line.qty }} x ${{ line.product.price.toFixed(2) }}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-                <div class="border-bottom pt-0 mb-15" />
-                <div class="cart-total">
-                  <div class="row">
-                    <div class="col-6 text-start">
-                      <span class="font-md-bold color-brand-3">Total</span>
-                    </div>
-                    <div class="col-6">
-                      <span class="font-md-bold color-brand-1">
-                        ${{ cart.subtotal.toFixed(2) }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="row mt-15">
-                    <div class="col-6 text-start">
-                      <router-link class="btn btn-cart w-auto" to="/cart">View cart</router-link>
-                    </div>
-                    <div class="col-6">
-                      <router-link class="btn btn-buy w-auto" to="/checkout">Checkout</router-link>
-                    </div>
-                  </div>
+            <div v-if="cartOpen && cart.items.length" class="z-mini-cart">
+              <div v-for="line in cart.items.slice(0, 3)" :key="line.product.id" class="z-mini-cart__item">
+                <img :src="line.product.image" :alt="line.product.name" />
+                <div>
+                  <router-link :to="`/product/${line.product.slug}`">{{ line.product.name }}</router-link>
+                  <p class="z-muted">{{ line.qty }} × <PriceDisplay :amount="line.product.price" :alt="false" /></p>
                 </div>
               </div>
+              <p class="z-muted" style="margin-bottom: 8px">
+                {{ t('cart.total') }}: <PriceDisplay :amount="cart.subtotal" :alt="false" />
+              </p>
+              <div class="z-grid z-grid-2">
+                <router-link class="z-btn z-btn-ghost" to="/cart">{{ t('footer.viewCart') }}</router-link>
+                <router-link class="z-btn z-btn-deal" to="/checkout">{{ t('cart.checkout') }}</router-link>
+              </div>
             </div>
-
-            <router-link
-              class="font-lg icon-list icon-compare d-none d-xl-inline-block"
-              to="/compare"
-            >
-              <span>Compare</span>
-              <span v-if="compare.count" class="number-item font-xs">{{ compare.count }}</span>
-            </router-link>
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="ui.mobileMenuOpen"
-      class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar sidebar-visible"
-    >
-      <div class="mobile-header-wrapper-inner">
-        <div class="mobile-header-content-area p-3">
-          <button class="btn btn-close mb-3" type="button" @click="ui.mobileMenuOpen = false">
-            Close
-          </button>
-          <ul class="mobile-menu font-heading">
-            <li v-for="item in flatMobile" :key="item.to">
-              <router-link :to="item.to" @click="ui.mobileMenuOpen = false">
-                {{ item.label }}
-              </router-link>
-            </li>
-          </ul>
-        </div>
+    <Teleport to="body">
+      <div v-if="ui.mobileMenuOpen" class="z-drawer">
+        <div class="z-drawer__mask" @click="ui.mobileMenuOpen = false" />
+        <aside class="z-drawer__panel" role="dialog" aria-modal="true" :aria-label="t('header.menu')">
+          <div class="z-drawer__head">
+            <router-link class="z-logo" to="/" @click="ui.mobileMenuOpen = false">
+              <span class="z-logo__mark">Z</span>
+              <span class="z-logo__text">{{ t('brand') }}</span>
+            </router-link>
+            <button class="z-drawer__close" type="button" :aria-label="t('header.close')" @click="ui.mobileMenuOpen = false">
+              <i class="material-icons">close</i>
+            </button>
+          </div>
+
+          <div class="z-drawer__quick">
+            <router-link class="z-drawer__quick-btn" :to="auth.user ? '/account' : '/login'" @click="ui.mobileMenuOpen = false">
+              <i class="material-icons">person_outline</i>
+              <span>{{ auth.user ? t('nav.account') : t('nav.login') }}</span>
+            </router-link>
+            <router-link class="z-drawer__quick-btn" to="/wishlist" @click="ui.mobileMenuOpen = false">
+              <i class="material-icons">favorite_border</i>
+              <span>{{ t('nav.wishlist') }}</span>
+              <em v-if="wishlist.count">{{ wishlist.count }}</em>
+            </router-link>
+            <router-link class="z-drawer__quick-btn" to="/cart" @click="ui.mobileMenuOpen = false">
+              <i class="material-icons">shopping_bag</i>
+              <span>{{ t('nav.cart') }}</span>
+              <em v-if="cart.count">{{ cart.count }}</em>
+            </router-link>
+          </div>
+
+          <p class="z-drawer__label">{{ t('header.mainNav') }}</p>
+          <nav class="z-drawer__nav">
+            <router-link
+              v-for="item in mobileNav"
+              :key="item.to"
+              :to="item.to"
+              class="z-drawer__link"
+              :class="{ 'is-active': isNavActive(item.to) }"
+              @click="ui.mobileMenuOpen = false"
+            >
+              {{ item.label }}
+            </router-link>
+          </nav>
+
+          <p class="z-drawer__label">{{ t('home.categories') }}</p>
+          <div class="z-drawer__cats">
+            <router-link class="z-chip z-chip--hot" to="/shop?tab=flash" @click="ui.mobileMenuOpen = false">{{ t('home.flash') }}</router-link>
+            <router-link
+              v-for="c in catalog.categories"
+              :key="`drawer-${c.id}`"
+              class="z-chip"
+              :to="{ path: '/shop', query: { category: c.slug } }"
+              @click="ui.mobileMenuOpen = false"
+            >
+              {{ c.name }}
+            </router-link>
+          </div>
+
+          <div class="z-drawer__prefs">
+            <button class="z-header__pref" :class="{ 'is-active': prefs.locale === 'en-US' }" type="button" @click="setLang('en-US')">EN</button>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.locale === 'km' }" type="button" @click="setLang('km')">ខ្មែរ</button>
+            <span class="z-header__sep">|</span>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.currency === 'USD' }" type="button" @click="prefs.setCurrency('USD')">USD</button>
+            <button class="z-header__pref" :class="{ 'is-active': prefs.currency === 'KHR' }" type="button" @click="prefs.setCurrency('KHR')">៛</button>
+          </div>
+        </aside>
       </div>
-    </div>
-    <div
-      v-if="ui.mobileMenuOpen"
-      class="body-overlay-1"
-      @click="ui.mobileMenuOpen = false"
-    />
+    </Teleport>
   </header>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import PriceDisplay from 'components/store/PriceDisplay.vue';
 import { useCartStore } from 'stores/cart-store';
 import { useAuthStore } from 'stores/auth-store';
 import { useCatalogStore } from 'stores/catalog-store';
 import { useWishlistStore } from 'stores/wishlist-store';
-import { useCompareStore } from 'stores/compare-store';
 import { useUiStore } from 'stores/ui-store';
-import { ecom } from 'src/helper/ecomAssets';
+import { usePrefsStore } from 'stores/prefs-store';
+import type { AppLocale } from 'stores/prefs-store';
 
-interface MenuChild {
-  label: string;
-  to: string;
-}
-
-interface MenuItem {
-  label: string;
-  to?: string;
-  twoCol?: boolean;
-  children?: MenuChild[];
-}
-
-const router = useRouter();
+const { t, locale } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const cart = useCartStore();
 const auth = useAuthStore();
 const catalog = useCatalogStore();
 const wishlist = useWishlistStore();
-const compare = useCompareStore();
 const ui = useUiStore();
+const prefs = usePrefsStore();
 
 const query = ref('');
 const category = ref('all');
-const openMenu = ref<string | null>(null);
 const cartOpen = ref(false);
-const stuck = ref(false);
+const scrolled = ref(false);
 
-const menu: MenuItem[] = [
-  { label: 'Home', to: '/' },
-  { label: 'Shop', to: '/shop' },
-  { label: 'Vendors', to: '/vendors' },
-  {
-    label: 'Pages',
-    children: [
-      { label: 'About Us', to: '/about' },
-      { label: 'Contact Us', to: '/contact' },
-      { label: 'Careers', to: '/careers' },
-      { label: 'Term and Condition', to: '/terms' },
-      { label: 'My Account', to: '/account' },
-      { label: 'Register', to: '/register' },
-      { label: 'Login', to: '/login' },
-    ],
-  },
-  {
-    label: 'Blog',
-    to: '/blog',
-    children: [
-      { label: 'Blog - No Sidebar', to: '/blog' },
-      { label: 'Blog - Right Sidebar', to: '/blog/alt' },
-      { label: 'Blog List', to: '/blog/list' },
-      { label: 'Blog category big', to: '/blog/big' },
-    ],
-  },
-  { label: 'Contact Us', to: '/contact' },
-];
+function onScroll() {
+  scrolled.value = window.scrollY > 24;
+}
 
-const flatMobile = computed(() => [
-  { label: 'Home', to: '/' },
-  { label: 'Shop', to: '/shop' },
-  { label: 'Vendors', to: '/vendors' },
-  { label: 'Wishlist', to: '/wishlist' },
-  { label: 'Compare', to: '/compare' },
-  { label: 'Blog', to: '/blog' },
-  { label: 'Account', to: '/account' },
-  { label: 'Contact', to: '/contact' },
+const mainNav = computed(() => [
+  { label: t('nav.home'), to: '/' },
+  { label: t('nav.shop'), to: '/shop' },
+  { label: t('nav.vendors'), to: '/vendors' },
+  { label: t('nav.blog'), to: '/blog' },
+  { label: t('nav.contact'), to: '/contact' },
 ]);
 
-function isActive(item: MenuItem) {
-  if (!item.to) return false;
-  if (item.to === '/') return route.path === '/';
-  return route.path.startsWith(item.to);
+const mobileNav = computed(() => [
+  ...mainNav.value,
+  { label: t('nav.about'), to: '/about' },
+  { label: t('home.flash'), to: '/shop?tab=flash' },
+  { label: t('nav.compare'), to: '/compare' },
+]);
+
+function isNavActive(to: string) {
+  if (to === '/') return route.path === '/';
+  return route.path === to || route.path.startsWith(`${to}/`);
+}
+
+function setLang(next: AppLocale) {
+  prefs.setLocale(next);
+  locale.value = next;
 }
 
 function onSearch() {
@@ -286,12 +240,10 @@ function onSearch() {
   });
 }
 
-function onScroll() {
-  stuck.value = window.scrollY > 80;
-}
-
 onMounted(() => {
+  locale.value = prefs.locale;
   if (!catalog.categories.length) void catalog.fetchCategories();
+  onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 });
 
@@ -299,23 +251,3 @@ onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
 });
 </script>
-
-<style scoped>
-.sidebar-visible {
-  visibility: visible !important;
-  opacity: 1 !important;
-  right: 0 !important;
-  display: block !important;
-  z-index: 10050;
-}
-.body-overlay-1 {
-  display: block !important;
-  opacity: 0.5;
-  z-index: 10040;
-}
-.sub-menu.is-open {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-</style>

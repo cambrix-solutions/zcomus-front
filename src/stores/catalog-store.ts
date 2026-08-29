@@ -7,6 +7,8 @@ import {
   type Category,
   type Product,
 } from 'src/data/mock-catalog';
+import { liveSellerProducts, mergeCatalogWithSeller } from 'src/data/seller-catalog';
+import { useSellerShop } from 'src/composables/useSellerShop';
 import {
   apiRequest,
   getApiErrorMessage,
@@ -17,12 +19,19 @@ import { endpoints } from 'src/helper/api/apiConfig';
 
 export const useCatalogStore = defineStore('catalog', () => {
   const categories = ref<Category[]>([]);
-  const products = ref<Product[]>([]);
+  const baseProducts = ref<Product[]>([]);
   const currentProduct = ref<Product | null>(null);
   const brands = ref<string[]>([...mockBrands]);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const usingMock = ref(true);
+
+  function sellerOverlay(): Product[] {
+    const { listings, shop } = useSellerShop();
+    return liveSellerProducts(listings.value, shop);
+  }
+
+  const products = computed(() => mergeCatalogWithSeller(baseProducts.value, sellerOverlay()));
 
   const flashProducts = computed(() => products.value.filter((p) => p.is_flash));
   const trendingProducts = computed(() => products.value.filter((p) => p.is_trending));
@@ -30,7 +39,7 @@ export const useCatalogStore = defineStore('catalog', () => {
 
   function applyMockCatalog() {
     categories.value = mockCategories;
-    products.value = mockProducts;
+    baseProducts.value = mockProducts;
     brands.value = [...mockBrands];
     usingMock.value = true;
   }
@@ -62,15 +71,15 @@ export const useCatalogStore = defineStore('catalog', () => {
       );
       const list = unwrapList(payload);
       if (list.length) {
-        products.value = list;
+        baseProducts.value = list;
         usingMock.value = false;
-        return list;
+        return products.value;
       }
     } catch {
       /* fall through to mock */
     }
-    if (!products.value.length) {
-      products.value = mockProducts;
+    if (!baseProducts.value.length) {
+      baseProducts.value = mockProducts;
       usingMock.value = true;
     }
     return products.value;
@@ -92,7 +101,7 @@ export const useCatalogStore = defineStore('catalog', () => {
         /* try local list / mock */
       }
 
-      if (!products.value.length) {
+      if (!baseProducts.value.length) {
         await fetchProducts();
       }
 
@@ -117,7 +126,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     error.value = null;
     try {
       await Promise.all([fetchCategories(), fetchProducts()]);
-      if (!categories.value.length || !products.value.length) {
+      if (!categories.value.length || !baseProducts.value.length) {
         applyMockCatalog();
       }
     } catch (e: unknown) {

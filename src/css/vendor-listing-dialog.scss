@@ -1,0 +1,544 @@
+/* ===== Modern listing dialog (is-rich) ===== */
+.z-seller-listing-modal {
+  align-items: center;
+  padding: 16px;
+  background: rgba(58, 50, 46, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.z-seller-listing-dialog.is-rich {
+  width: min(920px, 100%);
+  max-height: min(92vh, 880px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 24px 48px rgba(58, 50, 46, 0.18),
+    0 0 0 1px rgba(58, 50, 46, 0.04);
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head {
+  padding: 20px 22px 12px;
+  border-bottom: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f1eb 100%);
+}
+
+.z-listing-dialog__step {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--z-deal);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head p {
+  margin: 6px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  max-width: 48ch;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__close {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--z-line);
+  box-shadow: 0 2px 8px rgba(58, 50, 46, 0.06);
+}
+
+.z-listing-dialog__progress {
+  display: flex;
+  gap: 6px;
+  padding: 0 22px 14px;
+  background: linear-gradient(180deg, #fff 0%, #fff 100%);
+}
+
+.z-listing-dialog__progress i {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: #e8edf5;
+  transition: background 0.25s ease;
+}
+
+.z-listing-dialog__progress i.is-done {
+  background: var(--z-primary);
+}
+
+.z-listing-dialog__progress i.is-active {
+  background: linear-gradient(90deg, var(--z-primary), var(--z-deal));
+}
+
+/* Tabs — segmented pill bar (never underline) */
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin: 0 18px 16px;
+  padding: 5px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: #efeae3;
+  border-radius: 14px;
+  border-bottom: none;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 1 1 auto;
+  min-width: max-content;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--z-navy);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button .material-icons {
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button.is-active {
+  background: #fff;
+  color: var(--z-primary);
+  box-shadow: 0 2px 8px rgba(58, 50, 46, 0.1);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button.is-active .material-icons {
+  opacity: 1;
+  color: var(--z-primary);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--z-primary);
+}
+
+.z-listing-dialog__tab-label {
+  line-height: 1;
+}
+
+@media (min-width: 720px) {
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-pane {
+  padding: 20px 22px;
+  gap: 16px;
+  background: #fafbfd;
+}
+
+/* Photos tab layout */
+.z-listing-photos__drop {
+  min-height: 280px;
+  border-radius: 16px;
+}
+
+.z-listing-photos__grid {
+  display: grid;
+  gap: 18px;
+  align-items: start;
+}
+
+.z-listing-photos__preview {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.z-listing-photos__tip {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--z-muted);
+  text-align: center;
+  max-width: 36ch;
+  line-height: 1.45;
+}
+
+.z-listing-photos__strip {
+  padding: 14px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid var(--z-line);
+  box-shadow: 0 2px 12px rgba(58, 50, 46, 0.04);
+}
+
+.z-listing-photos__strip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.z-listing-photos__strip-head strong {
+  font-size: 0.88rem;
+  color: var(--z-ink);
+}
+
+.z-listing-photos__strip-head span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--z-deal);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(166, 112, 77, 0.12);
+}
+
+.z-listing-photos__thumbs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.z-listing-photos__thumbs .z-seller-gallery__thumb {
+  border-radius: 12px;
+}
+
+.z-listing-photos__thumbs .z-seller-gallery__badge {
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  width: auto;
+  min-width: 18px;
+  border-radius: 6px;
+}
+
+.z-listing-photos__samples {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px dashed rgba(166, 112, 77, 0.35);
+}
+
+.z-listing-photos__samples .z-seller-photo-samples__label {
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--z-navy);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-photo-sample {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-photo-sample:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--z-primary);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-photo-sample img {
+  object-fit: contain;
+  padding: 4px;
+  background: #fff;
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--z-line);
+}
+
+.z-seller-listing-dialog.is-rich .z-seller-dialog-publish .z-btn-deal {
+  min-width: 140px;
+  border-radius: 12px;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(166, 112, 77, 0.35);
+}
+
+@media (min-width: 720px) {
+  .z-listing-photos__grid {
+    grid-template-columns: minmax(280px, 380px) 1fr;
+  }
+
+  .z-listing-photos__thumbs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ===== Mobile sheet layout ===== */
+@media (max-width: 719px) {
+  .z-seller-listing-modal {
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(58, 50, 46, 0.55);
+  }
+
+  .z-seller-listing-dialog.is-rich {
+    width: 100%;
+    max-height: min(96dvh, 100dvh);
+    height: min(96dvh, 100dvh);
+    border-radius: 20px 20px 0 0;
+    border: 0;
+    box-shadow: 0 -8px 32px rgba(58, 50, 46, 0.2);
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head {
+    padding: 12px 14px 6px;
+    gap: 10px;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head h2 {
+    font-size: 1.12rem;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__head h2 + p {
+    display: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .z-listing-dialog__progress {
+    padding: 0 14px 8px;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs {
+    margin: 0 12px 10px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button {
+    flex: 0 0 auto;
+    padding: 8px 11px;
+    font-size: 0.74rem;
+    gap: 5px;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-pane {
+    padding: 12px 14px 16px;
+    gap: 12px;
+  }
+
+  .z-listing-photos__grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .z-listing-photos__strip {
+    order: -1;
+    padding: 12px;
+  }
+
+  /* Thumbnails are enough on mobile — large preview duplicates and crops badly */
+  .z-listing-photos__preview {
+    display: none;
+  }
+
+  .z-listing-photos__strip-head strong {
+    font-size: 0.82rem;
+    text-transform: capitalize;
+  }
+
+  .z-listing-photos__thumbs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px;
+    grid-template-columns: unset;
+    padding-bottom: 4px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .z-listing-photos__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .z-listing-photos__thumbs .z-seller-gallery__thumb,
+  .z-listing-photos__thumbs .z-seller-gallery__add {
+    flex: 0 0 88px;
+    width: 88px;
+    min-width: 88px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+  }
+
+  /* Hide cramped reorder arrows — tap thumb to set cover, drag still works */
+  .z-listing-photos__thumbs .z-seller-gallery__thumb-tools {
+    display: none;
+  }
+
+  .z-listing-photos__thumbs .z-seller-gallery__remove {
+    top: 4px;
+    right: 4px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .z-listing-photos__thumbs .z-seller-gallery__remove .material-icons {
+    font-size: 16px;
+  }
+
+  .z-listing-photos__thumbs .z-seller-gallery__badge {
+    left: 4px;
+    bottom: 4px;
+    font-size: 0.62rem;
+    padding: 2px 6px;
+  }
+
+  .z-listing-photos__drop {
+    min-height: 200px;
+  }
+
+  .z-listing-photos__samples {
+    padding: 12px;
+    margin-top: 0;
+  }
+
+  .z-listing-photos:has(.z-listing-photos__strip) .z-listing-photos__samples {
+    display: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-photo-samples {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-photo-samples::-webkit-scrollbar {
+    display: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-photo-sample {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-nav,
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-publish {
+    display: contents;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot .z-btn {
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  /* Steps 1–4: hide Publish; step-aware button rows */
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot:not(.is-last-step) .z-btn-deal {
+    display: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot:not(.is-last-step) .z-seller-dialog-nav .z-btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot:not(.is-last-step) .z-seller-dialog-nav .z-btn:last-child {
+    background: var(--z-primary);
+    color: #fff;
+    border-color: var(--z-primary);
+  }
+
+  /* Middle steps (Back + Continue): Cancel full width below */
+  .z-seller-listing-dialog.is-rich
+    .z-seller-listing-dialog__foot:not(.is-last-step):has(.z-seller-dialog-nav .z-btn:nth-child(2))
+    .z-seller-dialog-publish
+    .z-btn-ghost {
+    flex: 0 0 100%;
+    order: 10;
+  }
+
+  /* Step 1 (Continue only): Continue + Cancel side by side */
+  .z-seller-listing-dialog.is-rich
+    .z-seller-listing-dialog__foot:not(.is-last-step):has(.z-seller-dialog-nav .z-btn:only-child)
+    .z-seller-dialog-publish
+    .z-btn-ghost {
+    flex: 1 1 calc(50% - 4px);
+    order: unset;
+  }
+
+  /* Last step: Cancel + Publish, then Publish full width if Back is shown */
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot.is-last-step .z-seller-dialog-nav .z-btn,
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot.is-last-step .z-seller-dialog-publish .z-btn-ghost {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-listing-dialog__foot.is-last-step .z-seller-dialog-publish .z-btn-deal {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 0;
+    order: 10;
+  }
+}
+
+@media (max-width: 480px) {
+  .z-listing-dialog__tab-label {
+    display: none;
+  }
+
+  .z-seller-listing-dialog.is-rich .z-seller-dialog-tabs.z-listing-dialog__tabs button {
+    padding: 10px 12px;
+    min-width: 44px;
+  }
+}

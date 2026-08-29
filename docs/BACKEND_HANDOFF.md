@@ -32,8 +32,12 @@ The SPA calls the API with credentials (`withCredentials` + XSRF).
 
 1. Set `FRONTEND_URL=http://localhost:9000` in Laravel `.env`.
 2. Configure CORS for that origin with `supports_credentials: true`.
-3. Expose CSRF cookie endpoint (Sanctum recommended):
-   - `GET /sanctum/csrf-cookie` → `204`
+3. Expose CSRF cookie endpoint for the SPA (Laravel Breeze / `web` middleware):
+   - `GET /csrf-cookie` → `204` (starts session + sets `XSRF-TOKEN`)
+   - Example route:
+     ```php
+     Route::get('/csrf-cookie', fn () => response()->noContent())->middleware('web');
+     ```
 4. Ensure `POST /login`, `POST /register`, `POST /logout` work as **JSON** for the SPA (login already returns JSON; register should too).
 5. Add `GET /api/user` → `{ "user": { id, name, email, role } }` for authenticated customers.
 

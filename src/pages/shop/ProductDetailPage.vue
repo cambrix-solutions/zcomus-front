@@ -1,350 +1,235 @@
 <template>
-  <main class="main">
-    <div class="section-box">
-      <div class="breadcrumbs-div">
-        <div class="container">
-          <ul class="breadcrumb">
-            <li><router-link class="font-xs color-gray-1000" to="/">Home</router-link></li>
-            <li><router-link class="font-xs color-gray-500" to="/shop">Shop</router-link></li>
-            <li>
-              <span class="font-xs color-gray-500">{{ product?.name || 'Product' }}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+  <main class="z-container z-page">
+    <StoreCrumbs :crumbs="[{ label: t('shop.title'), to: '/shop' }, { label: product?.name || 'Product' }]" />
+
+    <div v-if="booting || catalog.loading" class="z-fade-item">
+      <SkeletonPdp />
     </div>
 
-    <section class="section-box shop-template mb-50">
-      <div class="container">
-        <div v-if="!product" class="py-50 text-center color-gray-500">
-          {{ catalog.loading ? 'Loading…' : 'Product not found.' }}
+    <div v-else-if="!product" class="z-empty">
+      Product not found.
+    </div>
+
+    <template v-else>
+      <div class="z-pdp z-fade-item">
+        <div class="z-pdp__gallery">
+          <img class="main" :src="gallery[activeThumb]" :alt="product.name" />
+          <div class="z-thumbs">
+            <button
+              v-for="(img, i) in gallery"
+              :key="i"
+              type="button"
+              :class="{ 'is-active': activeThumb === i }"
+              @click="activeThumb = i"
+            >
+              <img :src="img" :alt="`${product.name} ${i + 1}`" />
+            </button>
+          </div>
         </div>
 
-        <template v-else>
-          <div class="row">
-            <div class="col-lg-5">
-              <div class="gallery-image">
-                <div class="galleries">
-                  <div class="detail-gallery">
-                    <label v-if="product.badge" class="label">{{ product.badge }}</label>
-                    <div class="product-image-slider pdp-main-image">
-                      <figure class="border-radius-10">
-                        <img :src="gallery[activeThumb]" :alt="product.name" />
-                      </figure>
-                    </div>
-                  </div>
-                  <div class="slider-nav-thumbnails pdp-thumbs">
-                    <div
-                      v-for="(img, i) in gallery"
-                      :key="i"
-                      class="item-thumb"
-                      :class="{ active: activeThumb === i }"
-                      @click="activeThumb = i"
-                    >
-                      <img :src="img" :alt="`${product.name} ${i + 1}`" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-7">
-              <h3 class="color-brand-3 mb-25">{{ product.name }}</h3>
-              <div class="row align-items-center">
-                <div class="col-lg-4 col-md-4 col-sm-3 mb-mobile">
-                  <ProductVendorMeta :product="product" vendor-slug="fasfox" />
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-9 text-start text-sm-end">
-                  <a class="mr-20" href="#" @click.prevent="onWish">
-                    <span class="btn btn-wishlist mr-5 opacity-100 transform-none" />
-                    <span class="font-md color-gray-900">Add to Wish list</span>
-                  </a>
-                  <a href="#" @click.prevent="onCompare">
-                    <span class="btn btn-compare mr-5 opacity-100 transform-none" />
-                    <span class="font-md color-gray-900">Add to Compare</span>
-                  </a>
-                </div>
-              </div>
-              <div class="border-bottom pt-10 mb-20" />
-
-              <div class="box-product-price">
-                <h3 class="color-brand-3 price-main d-inline-block mr-10">
-                  ${{ product.price.toFixed(2) }}
-                </h3>
-                <span
-                  v-if="product.compare_at_price"
-                  class="color-gray-500 price-line font-xl line-througt"
-                >
-                  ${{ product.compare_at_price.toFixed(2) }}
-                </span>
-              </div>
-
-              <div class="product-description mt-20 color-gray-900">
-                <div class="row">
-                  <div class="col-lg-6 col-md-6 col-sm-12">
-                    <ul class="list-dot">
-                      <li v-for="f in featuresLeft" :key="f">{{ f }}</li>
-                    </ul>
-                  </div>
-                  <div class="col-lg-6 col-md-6 col-sm-12">
-                    <ul class="list-dot">
-                      <li v-for="f in featuresRight" :key="f">{{ f }}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div class="box-product-color mt-20">
-                <p class="font-sm color-gray-900">
-                  Color:<span class="color-brand-2 nameColor">{{ selectedColor }}</span>
-                </p>
-                <ul class="list-colors">
-                  <li
-                    v-for="(c, i) in colors"
-                    :key="c.name"
-                    :class="{ active: selectedColor === c.name, disabled: c.disabled }"
-                    :title="c.name"
-                    @click="selectColor(c, i)"
-                  >
-                    <img :src="c.img" :alt="c.name" />
-                  </li>
-                </ul>
-              </div>
-
-              <div class="box-product-style-size mt-20">
-                <div class="row">
-                  <div class="col-lg-6 col-md-6 mb-20">
-                    <p class="font-sm color-gray-900">
-                      Style:<span class="color-brand-2 nameStyle">{{ selectedStyle }}</span>
-                    </p>
-                    <ul class="list-styles">
-                      <li
-                        v-for="s in styles"
-                        :key="s"
-                        :class="{ active: selectedStyle === s }"
-                        :title="s"
-                        @click="selectedStyle = s"
-                      >
-                        {{ s }}
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="col-lg-6 col-md-6 mb-20">
-                    <p class="font-sm color-gray-900">
-                      Size:<span class="color-brand-2 nameSize">{{ selectedSize }}</span>
-                    </p>
-                    <ul class="list-sizes">
-                      <li
-                        v-for="s in sizes"
-                        :key="s"
-                        :class="{ active: selectedSize === s }"
-                        :title="s"
-                        @click="selectedSize = s"
-                      >
-                        {{ s }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div class="buy-product mt-30">
-                <p class="font-sm mb-20">Quantity</p>
-                <div class="box-quantity">
-                  <div class="input-quantity">
-                    <input class="font-xl color-brand-3" type="text" :value="qty" readonly />
-                    <span class="minus-cart" @click="qty = Math.max(1, qty - 1)" />
-                    <span class="plus-cart" @click="qty += 1" />
-                  </div>
-                  <div class="button-buy">
-                    <a class="btn btn-cart" href="#" @click.prevent="onAdd">Add to cart</a>
-                    <a class="btn btn-buy" href="#" @click.prevent="onBuy">Buy now</a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="info-product mt-40">
-                <div class="row align-items-end">
-                  <div class="col-lg-4 col-md-4 mb-20">
-                    <span class="font-sm font-medium color-gray-900">
-                      SKU:<span class="color-gray-500"> zc-{{ product.id }}</span><br />
-                      Category:<span class="color-gray-500"> {{ categoryName }}</span><br />
-                      Tags:<span class="color-gray-500"> {{ product.brand }}, Marketplace</span>
-                    </span>
-                  </div>
-                  <div class="col-lg-4 col-md-4 mb-20">
-                    <span class="font-sm font-medium color-gray-900">
-                      Free Delivery<br />
-                      <span class="color-gray-500">Available nationwide in Cambodia.</span><br />
-                      <span class="color-gray-500">Delivery Options & Info</span>
-                    </span>
-                  </div>
-                  <div class="col-lg-4 col-md-4 mb-20 text-start text-md-end">
-                    <div class="d-inline-block">
-                      <div class="share-link">
-                        <span class="font-md-bold color-brand-3 mr-15">Share</span>
-                        <a class="facebook hover-up" href="#" @click.prevent />
-                        <a class="printest hover-up" href="#" @click.prevent />
-                        <a class="twitter hover-up" href="#" @click.prevent />
-                        <a class="instagram hover-up" href="#" @click.prevent />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="z-pdp__buy">
+          <h1 class="z-pdp__title">{{ product.name }}</h1>
+          <ProductVendorMeta :product="product" :vendor-slug="product.vendor_slug || 'fasfox'" />
+          <div class="z-pdp__price">
+            <PriceDisplay :amount="displayPrice" :compare-at="product.compare_at_price" />
           </div>
+          <p class="z-pdp__desc">{{ shortDesc }}</p>
 
-          <div class="border-bottom pt-30 mb-40" />
-          <h4 class="color-brand-3 mb-20">Frequently Bought Together</h4>
-          <div class="box-bought-together">
-            <div class="box-product-bought">
-              <div
-                v-for="p in boughtTogether"
-                :key="p.id"
-                class="product-bought"
+          <div v-if="colors.length" class="z-pdp__option">
+            <p class="z-label">Color: {{ selectedColor }}</p>
+            <div class="z-swatch-row">
+              <button
+                v-for="c in colors"
+                :key="c.name"
+                class="z-swatch"
+                :class="{ 'is-active': selectedColor === c.name }"
+                :disabled="c.disabled"
+                type="button"
+                @click="selectColor(c)"
               >
-                <img :src="p.image" :alt="p.name" />
-              </div>
-            </div>
-            <div class="price-bought">
-              <h3 class="color-brand-3 mr-10">${{ bundleTotal.toFixed(2) }}</h3>
-              <span class="font-lg color-gray-900">({{ bundleChecked.length }} items)</span>
-              <div class="box-btn-add-cart">
-                <a class="btn btn-cart" href="#" @click.prevent="onAddBundle">Add To Cart</a>
-              </div>
+                {{ c.name }}
+              </button>
             </div>
           </div>
-          <label
-            v-for="p in boughtTogether"
-            :key="`cb-${p.id}`"
-            class="cb-container-2"
-          >
+          <div v-if="styles.length" class="z-pdp__option">
+            <p class="z-label">Style: {{ selectedStyle }}</p>
+            <div class="z-swatch-row">
+              <button
+                v-for="s in styles"
+                :key="s.name"
+                class="z-swatch"
+                :class="{ 'is-active': selectedStyle === s.name }"
+                :disabled="s.disabled"
+                type="button"
+                @click="!s.disabled && (selectedStyle = s.name)"
+              >
+                {{ s.name }}
+              </button>
+            </div>
+          </div>
+          <div v-if="sizes.length" class="z-pdp__option">
+            <p class="z-label">Size: {{ selectedSize }}</p>
+            <div class="z-swatch-row">
+              <button
+                v-for="s in sizes"
+                :key="s.name"
+                class="z-swatch"
+                :class="{ 'is-active': selectedSize === s.name }"
+                :disabled="s.disabled"
+                type="button"
+                @click="!s.disabled && (selectedSize = s.name)"
+              >
+                {{ s.name }}
+              </button>
+            </div>
+          </div>
+
+          <div class="z-pdp__actions">
+            <div class="z-qty">
+              <button type="button" :disabled="maxQty < 1" @click="qty = Math.max(1, qty - 1)">−</button>
+              <input :value="qty" readonly />
+              <button type="button" :disabled="maxQty < 1" @click="qty = Math.min(maxQty, qty + 1)">+</button>
+            </div>
+            <button class="z-btn z-btn-primary" type="button" :disabled="!canPurchase" @click="onAdd">
+              {{ canPurchase ? t('product.addCart') : t('product.outOfStock') }}
+            </button>
+            <button class="z-btn z-btn-deal" type="button" :disabled="!canPurchase" @click="onBuy">
+              {{ t('product.buy') }}
+            </button>
+            <button class="z-btn z-btn-ghost" type="button" @click="onWish">{{ t('product.wishlist') }}</button>
+            <button class="z-btn z-btn-ghost" type="button" @click="onCompare">{{ t('nav.compare') }}</button>
+          </div>
+
+          <p v-if="variantStockLabel" class="z-muted">{{ variantStockLabel }}</p>
+
+          <p class="z-muted z-pdp__sku">
+            SKU: {{ productSku }} · {{ categoryName }} · Ships nationwide in Cambodia
+          </p>
+        </div>
+      </div>
+
+      <div class="z-pdp-sticky">
+        <button class="z-btn z-btn-primary" type="button" :disabled="!canPurchase" @click="onAdd">
+          {{ canPurchase ? t('product.addCart') : t('product.outOfStock') }}
+        </button>
+        <button class="z-btn z-btn-deal" type="button" :disabled="!canPurchase" @click="onBuy">
+          {{ t('product.buy') }}
+        </button>
+      </div>
+
+      <section class="z-pdp-panel">
+        <h3>Frequently bought together</h3>
+        <div class="z-pdp-bundle">
+          <label v-for="p in boughtTogether" :key="p.id" class="z-pdp-bundle__item">
             <input v-model="bundleIds" type="checkbox" :value="p.id" />
-            <span class="font-md color-brand-3">
-              <strong v-if="p.id === product.id">This item:</strong>
-              {{ p.name }} - ${{ p.price.toFixed(2) }}
-            </span>
-            <span class="checkmark" />
+            <span>{{ p.name }}</span>
+            <PriceDisplay :amount="p.price" :alt="false" />
           </label>
-        </template>
-      </div>
-    </section>
+        </div>
+        <p><strong><PriceDisplay :amount="bundleTotal" /></strong></p>
+        <button class="z-btn z-btn-primary" type="button" @click="onAddBundle">{{ t('product.addCart') }}</button>
+      </section>
 
-    <section v-if="product" class="section-box shop-template mb-50">
-      <div class="container">
-        <div class="pt-10 mb-10">
-          <ul class="nav nav-tabs nav-tabs-product">
-            <li v-for="t in detailTabs" :key="t.id">
-              <a
-                href="#"
-                :class="{ active: detailTab === t.id }"
-                @click.prevent="detailTab = t.id"
-              >
-                {{ t.label }}
-              </a>
-            </li>
-          </ul>
-          <div class="tab-content pt-25">
-            <div v-if="detailTab === 'description'" class="display-text-short">
-              <p>
-                {{ product.description || 'Premium marketplace product ready to ship.' }}
-              </p>
-              <ul class="list-dot mt-15">
-                <li>Quality checked before dispatch</li>
-                <li>Official accessory pack where applicable</li>
-                <li>Secure packaging for marketplace delivery</li>
-              </ul>
-            </div>
-
-            <div v-else-if="detailTab === 'specs'">
-              <table class="table table-striped">
-                <tbody>
-                  <tr><td>Brand</td><td>{{ product.brand }}</td></tr>
-                  <tr><td>SKU</td><td>zc-{{ product.id }}</td></tr>
-                  <tr><td>Style</td><td>{{ selectedStyle }}</td></tr>
-                  <tr><td>Size</td><td>{{ selectedSize }}</td></tr>
-                  <tr><td>Color</td><td>{{ selectedColor }}</td></tr>
-                  <tr><td>Availability</td><td>In stock</td></tr>
-                  <tr><td>Warranty</td><td>12 months</td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div v-else-if="detailTab === 'additional'">
-              <p class="font-md color-gray-900">
-                Package includes product, quick start guide, and warranty card. Colors and
-                packaging may vary by region.
-              </p>
-            </div>
-
-            <div v-else-if="detailTab === 'reviews'">
-              <h5 class="mb-20">Customer reviews (2)</h5>
-              <div v-for="r in reviews" :key="r.id" class="mb-25 pb-20 border-bottom">
-                <strong class="font-md">{{ r.name }}</strong>
-                <span class="font-xs color-gray-500 ms-2">{{ r.date }}</span>
-                <div class="rating mt-5 mb-10">
-                  <img v-for="n in 5" :key="n" :src="star" alt="" />
-                </div>
-                <p class="font-sm color-gray-900 mt-10 mb-0">{{ r.text }}</p>
-              </div>
-            </div>
-
-            <div v-else>
-              <h5 class="mb-15">Vendor</h5>
-              <p class="font-md color-gray-900">
-                Sold by
-                <router-link class="color-brand-2" to="/vendors/fasfox">Fasfox Corporation</router-link>.
-                Ships from regional warehouse · top-rated seller.
-              </p>
-            </div>
+      <section class="z-pdp-panel">
+        <div class="z-tabs">
+          <button
+            v-for="tab in detailTabs"
+            :key="tab.id"
+            type="button"
+            :class="{ 'is-active': detailTab === tab.id }"
+            @click="detailTab = tab.id"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+        <div v-if="detailTab === 'description'">
+          <p>{{ longDesc }}</p>
+        </div>
+        <table v-else-if="detailTab === 'specs'" class="z-table">
+          <tbody>
+            <tr><td>Brand</td><td>{{ product.brand }}</td></tr>
+            <tr><td>SKU</td><td>{{ productSku }}</td></tr>
+            <tr v-if="selectedStyle"><td>Style</td><td>{{ selectedStyle }}</td></tr>
+            <tr v-if="selectedSize"><td>Size</td><td>{{ selectedSize }}</td></tr>
+            <tr v-if="selectedColor"><td>Color</td><td>{{ selectedColor }}</td></tr>
+            <tr v-for="row in specRows" :key="row.label">
+              <td>{{ row.label }}</td>
+              <td>{{ row.value }}</td>
+            </tr>
+            <tr><td>Warranty</td><td>{{ product.warranty || '12 months' }}</td></tr>
+          </tbody>
+        </table>
+        <div v-else-if="detailTab === 'reviews'">
+          <div v-for="r in reviews" :key="r.id" class="z-pdp-review">
+            <strong>{{ r.name }}</strong>
+            <span class="z-muted"> {{ r.date }}</span>
+            <p>{{ r.text }}</p>
           </div>
         </div>
+        <p v-else>
+          Sold by
+          <router-link :to="`/vendors/${product.vendor_slug || 'fasfox'}`">
+            {{ product.vendor_name || product.brand }}
+          </router-link>.
+          {{ product.vendor_bio || 'Ships from Cambodia warehouse.' }}
+        </p>
+      </section>
 
-        <div class="mt-40">
-          <div class="head-main mb-20">
-            <h4 class="mb-5">Related products</h4>
-          </div>
-          <div class="list-products-5">
-            <ProductCard
-              v-for="p in related"
-              :key="p.id"
-              :product="p"
-              @add="(x) => cart.add(x)"
-              @open="onOpenRelated"
-            />
-          </div>
+      <section class="z-section">
+        <div class="z-section-head">
+          <h2>Related products</h2>
         </div>
-      </div>
-    </section>
+        <div class="z-products">
+          <ProductCard
+            v-for="p in related"
+            :key="p.id"
+            :product="p"
+            @add="(x) => cart.add(x)"
+            @open="onOpenRelated"
+            @quickview="onQuickviewRelated"
+          />
+        </div>
+      </section>
+
+      <TrustStrip />
+    </template>
   </main>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { Notify } from 'quasar';
 import { storeToRefs } from 'pinia';
 import ProductCard from 'components/store/ProductCard.vue';
 import ProductVendorMeta from 'components/shop/ProductVendorMeta.vue';
+import PriceDisplay from 'components/store/PriceDisplay.vue';
+import StoreCrumbs from 'components/store/StoreCrumbs.vue';
+import TrustStrip from 'components/home/TrustStrip.vue';
+import SkeletonPdp from 'components/store/SkeletonPdp.vue';
 import { ecom } from 'src/helper/ecomAssets';
 import { useCartStore } from 'stores/cart-store';
 import { useCatalogStore } from 'stores/catalog-store';
 import { useWishlistStore } from 'stores/wishlist-store';
 import { useCompareStore } from 'stores/compare-store';
+import { useUiStore } from 'stores/ui-store';
+import type { Product } from 'src/data/mock-catalog';
+import type { CartOptions } from 'stores/cart-store';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const cart = useCartStore();
 const catalog = useCatalogStore();
 const wishlist = useWishlistStore();
 const compare = useCompareStore();
+const ui = useUiStore();
+const booting = ref(true);
 const { currentProduct, products } = storeToRefs(catalog);
-
-const star = ecom('imgs/template/icons/star.svg');
 const product = computed(() => currentProduct.value);
 
-const galleryAssets = [
+const legacyGalleryAssets = [
   ecom('imgs/page/product/img-gallery-1.jpg'),
   ecom('imgs/page/product/img-gallery-2.jpg'),
   ecom('imgs/page/product/img-gallery-3.jpg'),
@@ -353,228 +238,269 @@ const galleryAssets = [
 ];
 
 const gallery = computed(() => {
-  if (!product.value) return galleryAssets;
-  return [product.value.image, ...galleryAssets.filter((g) => g !== product.value!.image)].slice(
-    0,
-    5,
-  );
+  if (!product.value) return [];
+  const own = (product.value.images?.length ? product.value.images : [product.value.image]).filter(Boolean);
+  if (product.value.is_seller || own.length > 1) return own.slice(0, 5);
+  return [product.value.image, ...legacyGalleryAssets.filter((g) => g !== product.value!.image)].slice(0, 5);
 });
 
-const colors = computed(() =>
-  gallery.value.map((img, i) => ({
-    name: ['Pink', 'Gold', 'Pink Gold', 'Silver', 'Black'][i] ?? `Color ${i + 1}`,
-    img,
-    disabled: i === 0 || i === 4,
-  })),
-);
+function optionDisabled(
+  name: string,
+  kind: 'color' | 'style' | 'size',
+  available: boolean,
+): boolean {
+  if (!available) return true;
+  const variants = product.value?.variants;
+  if (!variants?.length) return false;
+  return !variants.some((v) => {
+    if (kind === 'color' && v.color !== name) return false;
+    if (kind === 'style' && v.style !== name) return false;
+    if (kind === 'size' && v.size !== name) return false;
+    return v.stock > 0;
+  });
+}
 
-const styles = ['S22 Ultra', 'S22', 'S22 + Cover'];
-const sizes = ['512 GB', '256 GB', '128 GB'];
+type PdpColor = {
+  name: string;
+  imageIndex?: number;
+  disabled: boolean;
+  fallbackIndex?: number;
+};
+
+const colors = computed((): PdpColor[] => {
+  if (!product.value) return [];
+  if (product.value.colorOptions?.length) {
+    return product.value.colorOptions.map((o, i) => {
+      const row: PdpColor = {
+        name: o.name,
+        disabled: optionDisabled(o.name, 'color', o.available),
+        fallbackIndex: i,
+      };
+      if (typeof o.imageIndex === 'number') row.imageIndex = o.imageIndex;
+      return row;
+    });
+  }
+  if (product.value.colors?.length) {
+    return product.value.colors.map((name, i) => ({
+      name,
+      disabled: false,
+      fallbackIndex: i,
+    }));
+  }
+  if (product.value.is_seller) return [];
+  return gallery.value.map((_img, i) => ({
+    name: ['Pink', 'Gold', 'Pink Gold', 'Silver', 'Black'][i] ?? `Color ${i + 1}`,
+    imageIndex: i,
+    disabled: i === 0 || i === 4,
+    fallbackIndex: i,
+  }));
+});
+
+const styles = computed(() => {
+  if (!product.value) return [] as { name: string; disabled: boolean }[];
+  if (product.value.styleOptions?.length) {
+    return product.value.styleOptions.map((o) => ({
+      name: o.name,
+      disabled: optionDisabled(o.name, 'style', o.available),
+    }));
+  }
+  if (product.value.styles?.length) {
+    return product.value.styles.map((name) => ({ name, disabled: false }));
+  }
+  if (product.value.is_seller) return [];
+  return ['S22 Ultra', 'S22', 'S22 + Cover'].map((name) => ({ name, disabled: false }));
+});
+
+const sizes = computed(() => {
+  if (!product.value) return [] as { name: string; disabled: boolean }[];
+  if (product.value.sizeOptions?.length) {
+    return product.value.sizeOptions.map((o) => ({
+      name: o.name,
+      disabled: optionDisabled(o.name, 'size', o.available),
+    }));
+  }
+  if (product.value.sizes?.length) {
+    return product.value.sizes.map((name) => ({ name, disabled: false }));
+  }
+  if (product.value.is_seller) return [];
+  return ['512 GB', '256 GB', '128 GB'].map((name) => ({ name, disabled: false }));
+});
 
 const qty = ref(1);
 const activeThumb = ref(0);
-const selectedColor = ref('Pink Gold');
-const selectedStyle = ref('S22');
-const selectedSize = ref('512 GB');
-const detailTab = ref<'description' | 'specs' | 'additional' | 'reviews' | 'vendor'>(
-  'description',
-);
+const selectedColor = ref('');
+const selectedStyle = ref('');
+const selectedSize = ref('');
+const detailTab = ref<'description' | 'specs' | 'reviews' | 'vendor'>('description');
 const bundleIds = ref<number[]>([]);
-
 const detailTabs = [
   { id: 'description' as const, label: 'Description' },
-  { id: 'specs' as const, label: 'Specification' },
-  { id: 'additional' as const, label: 'Additional information' },
-  { id: 'reviews' as const, label: 'Reviews (2)' },
+  { id: 'specs' as const, label: 'Specs' },
+  { id: 'reviews' as const, label: 'Reviews' },
   { id: 'vendor' as const, label: 'Vendor' },
 ];
-
-const featuresLeft = [
-  '8k super steady video',
-  'Nightography plus portrait mode',
-  '50mp photo resolution plus bright display',
-];
-const featuresRight = [
-  'Adaptive color contrast',
-  'Premium design & craftmanship',
-  'Long lasting battery plus fast charging',
-];
-
 const reviews = [
-  {
-    id: 1,
-    name: 'Sopheak M.',
-    date: '10 Aug 2026',
-    text: 'Great quality and packaging. Arrived faster than expected.',
-  },
-  {
-    id: 2,
-    name: 'Dara K.',
-    date: '02 Aug 2026',
-    text: 'Matches the description. Would buy again from this seller.',
-  },
+  { id: 1, name: 'Sopheak M.', date: '10 Aug 2026', text: 'Great quality. Arrived faster than expected.' },
+  { id: 2, name: 'Dara K.', date: '02 Aug 2026', text: 'Matches the description. Would buy again.' },
 ];
-
 const categoryName = computed(() => {
   const id = product.value?.category_id;
   return catalog.categories.find((c) => c.id === id)?.name ?? 'Marketplace';
 });
-
-const related = computed(() =>
-  products.value.filter((p) => p.id !== product.value?.id).slice(0, 5),
+const productSku = computed(() => product.value?.sku || `zc-${product.value?.id ?? ''}`);
+const shortDesc = computed(
+  () =>
+    product.value?.short_description ||
+    product.value?.description ||
+    'Ships across Cambodia. Quality checked before dispatch.',
+);
+const longDesc = computed(
+  () => product.value?.description || 'Premium marketplace product ready to ship.',
 );
 
+const activeVariant = computed(() => {
+  const variants = product.value?.variants;
+  if (!variants?.length) return null;
+  const key = `${selectedColor.value || ''}|${selectedStyle.value || ''}|${selectedSize.value || ''}`;
+  return variants.find((v) => v.key === key) || null;
+});
+
+const displayPrice = computed(() => {
+  if (activeVariant.value?.price && activeVariant.value.price > 0) return activeVariant.value.price;
+  return product.value?.price || 0;
+});
+
+const maxQty = computed(() => {
+  if (activeVariant.value) return Math.max(0, activeVariant.value.stock);
+  const stock = product.value?.stock;
+  if (typeof stock === 'number') return Math.max(0, stock);
+  return 99;
+});
+
+const canPurchase = computed(() => maxQty.value > 0);
+
+const variantStockLabel = computed(() => {
+  if (!product.value?.variants?.length) return '';
+  if (!activeVariant.value) return '';
+  return activeVariant.value.stock > 0
+    ? `${activeVariant.value.stock} in stock for this option`
+    : 'Out of stock for this option';
+});
+
+watch(maxQty, (cap) => {
+  if (qty.value > cap) qty.value = Math.max(1, cap) || 1;
+  if (cap < 1) qty.value = 1;
+});
+
+const specRows = computed(() => {
+  const raw = product.value?.specs?.trim();
+  if (!raw) return [] as { label: string; value: string }[];
+  return raw
+    .split(/\n|;/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const sep = line.includes(':') ? ':' : line.includes('=') ? '=' : null;
+      if (!sep) return { label: 'Spec', value: line };
+      const [label, ...rest] = line.split(sep);
+      return { label: (label ?? '').trim() || 'Spec', value: rest.join(sep).trim() };
+    });
+});
+const selectedOptions = computed((): CartOptions | undefined => {
+  const opts: CartOptions = {};
+  if (selectedColor.value) opts.color = selectedColor.value;
+  if (selectedStyle.value) opts.style = selectedStyle.value;
+  if (selectedSize.value) opts.size = selectedSize.value;
+  return opts.color || opts.style || opts.size ? opts : undefined;
+});
+const related = computed(() =>
+  products.value
+    .filter((p) => p.id !== product.value?.id && p.category_id === product.value?.category_id)
+    .concat(products.value.filter((p) => p.id !== product.value?.id))
+    .filter((p, i, arr) => arr.findIndex((x) => x.id === p.id) === i)
+    .slice(0, 5),
+);
 const boughtTogether = computed(() => {
   if (!product.value) return [];
   const extras = products.value.filter((p) => p.id !== product.value!.id).slice(0, 2);
   return [product.value, ...extras];
 });
+const bundleChecked = computed(() => boughtTogether.value.filter((p) => bundleIds.value.includes(p.id)));
+const bundleTotal = computed(() => bundleChecked.value.reduce((sum, p) => sum + p.price, 0));
 
-const bundleChecked = computed(() =>
-  boughtTogether.value.filter((p) => bundleIds.value.includes(p.id)),
-);
+watch(boughtTogether, (list) => {
+  bundleIds.value = list.map((p) => p.id);
+}, { immediate: true });
 
-const bundleTotal = computed(() =>
-  bundleChecked.value.reduce((sum, p) => sum + p.price, 0),
-);
-
-watch(
-  boughtTogether,
-  (list) => {
-    bundleIds.value = list.map((p) => p.id);
-  },
-  { immediate: true },
-);
-
-async function load() {
-  await catalog.fetchProduct(String(route.params.slug));
-  if (!products.value.length) await catalog.fetchProducts();
-  activeThumb.value = 0;
+function syncSelections() {
+  selectedColor.value = colors.value.find((c) => !c.disabled)?.name || colors.value[0]?.name || '';
+  selectedStyle.value = styles.value.find((s) => !s.disabled)?.name || styles.value[0]?.name || '';
+  selectedSize.value = sizes.value.find((s) => !s.disabled)?.name || sizes.value[0]?.name || '';
+  const firstColor = colors.value.find((c) => c.name === selectedColor.value);
+  if (firstColor && typeof firstColor.imageIndex === 'number' && firstColor.imageIndex >= 0) {
+    activeThumb.value = firstColor.imageIndex % Math.max(gallery.value.length, 1);
+  } else {
+    activeThumb.value = 0;
+  }
   qty.value = 1;
 }
 
-function selectColor(c: { name: string; disabled?: boolean }, i: number) {
+async function load() {
+  booting.value = true;
+  const started = Date.now();
+  await catalog.fetchProduct(String(route.params.slug));
+  if (!products.value.length) await catalog.fetchProducts();
+  syncSelections();
+  const wait = Math.max(0, 350 - (Date.now() - started));
+  if (wait) await new Promise((r) => setTimeout(r, wait));
+  booting.value = false;
+}
+function selectColor(c: { name: string; disabled?: boolean; imageIndex?: number; fallbackIndex?: number }) {
   if (c.disabled) return;
   selectedColor.value = c.name;
-  activeThumb.value = i % gallery.value.length;
+  if (typeof c.imageIndex === 'number' && c.imageIndex >= 0) {
+    activeThumb.value = c.imageIndex % Math.max(gallery.value.length, 1);
+  } else if (typeof c.fallbackIndex === 'number') {
+    activeThumb.value = c.fallbackIndex % Math.max(gallery.value.length, 1);
+  }
 }
-
+function cartProduct(): Product | null {
+  if (!product.value) return null;
+  if (displayPrice.value === product.value.price) return product.value;
+  return { ...product.value, price: displayPrice.value };
+}
 function onAdd() {
-  if (!product.value) return;
-  cart.add(product.value, qty.value);
-  Notify.create({ type: 'positive', message: 'Added to cart', position: 'top' });
+  const p = cartProduct();
+  if (!p || !canPurchase.value) return;
+  cart.add(p, qty.value, selectedOptions.value);
+  Notify.create({ type: 'positive', message: t('product.addCart'), position: 'top' });
 }
-
 function onBuy() {
   onAdd();
-  void router.push('/checkout');
+  if (canPurchase.value) void router.push('/checkout');
 }
-
 function onAddBundle() {
-  for (const p of bundleChecked.value) cart.add(p, 1);
-  Notify.create({
-    type: 'positive',
-    message: `Added ${bundleChecked.value.length} items to cart`,
-    position: 'top',
-  });
+  for (const p of bundleChecked.value) {
+    cart.add(p, 1, p.id === product.value?.id ? selectedOptions.value : undefined);
+  }
+  Notify.create({ type: 'positive', message: t('product.addCart'), position: 'top' });
 }
-
 function onWish() {
   if (!product.value) return;
-  const added = wishlist.toggle(product.value);
-  Notify.create({
-    type: 'positive',
-    message: added ? 'Added to wishlist' : 'Removed from wishlist',
-    position: 'top',
-  });
+  wishlist.toggle(product.value);
+  Notify.create({ type: 'positive', message: t('product.wishlist'), position: 'top' });
 }
-
 function onCompare() {
   if (!product.value) return;
-  const wasIn = compare.has(product.value.id);
   const ok = compare.toggle(product.value);
-  Notify.create({
-    type: ok ? 'positive' : 'warning',
-    message: !ok
-      ? `Compare full (max ${compare.MAX})`
-      : wasIn
-        ? 'Removed from compare'
-        : 'Added to compare',
-    position: 'top',
-  });
+  Notify.create({ type: ok ? 'positive' : 'warning', message: t('nav.compare'), position: 'top' });
 }
-
 function onOpenRelated(p: { slug: string }) {
   void router.push(`/product/${p.slug}`);
 }
-
+function onQuickviewRelated(p: Product) {
+  ui.openQuickview(p);
+}
 onMounted(() => void load());
 watch(() => route.params.slug, () => void load());
 </script>
-
-<style scoped>
-.pdp-main-image figure {
-  margin: 0;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 360px;
-}
-.pdp-main-image img {
-  max-height: 420px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
-.pdp-thumbs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
-}
-.pdp-thumbs .item-thumb {
-  width: 72px;
-  height: 72px;
-  border: 1px solid #d5dfe4;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  padding: 4px;
-  background: #fff;
-}
-.pdp-thumbs .item-thumb.active {
-  border-color: #fd9636;
-}
-.pdp-thumbs .item-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.list-colors li,
-.list-styles li,
-.list-sizes li {
-  cursor: pointer;
-}
-.list-colors li.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-.input-quantity .minus-cart,
-.input-quantity .plus-cart {
-  cursor: pointer;
-}
-:deep(.list-products-5 .card-grid-style-3 .list-features) {
-  display: none;
-}
-@media (max-width: 1199px) {
-  :deep(.list-products-5 .card-grid-style-3) {
-    width: 33.333%;
-  }
-}
-@media (max-width: 767px) {
-  :deep(.list-products-5 .card-grid-style-3) {
-    width: 50%;
-  }
-}
-</style>

@@ -1,242 +1,195 @@
 <template>
-  <main class="main">
-    <div class="section-box">
-      <div class="breadcrumbs-div">
-        <div class="container">
-          <ul class="breadcrumb">
-            <li><router-link class="font-xs color-gray-1000" to="/">Home</router-link></li>
-            <li><router-link class="font-xs color-gray-500" to="/shop">Shop</router-link></li>
-            <li><span class="font-xs color-gray-500">Cart</span></li>
-          </ul>
+  <main class="z-container z-page">
+    <StoreCrumbs :crumbs="[{ label: t('shop.title'), to: '/shop' }, { label: t('cart.title') }]" />
+
+    <div v-if="booting" class="z-cart-layout z-fade-item">
+      <div class="z-card">
+        <div v-for="n in 2" :key="n" class="z-skel-cart-line">
+          <div class="z-skel z-skel-cart-line__img" />
+          <div class="z-skel-cart-line__body">
+            <div class="z-skel z-skel--md" style="width: 70%" />
+            <div class="z-skel z-skel--sm" style="width: 40%; margin-top: 8px" />
+          </div>
         </div>
+      </div>
+      <div class="z-card">
+        <div class="z-skel z-skel--md" style="width: 50%" />
+        <div class="z-skel z-skel--sm" style="width: 100%; margin-top: 14px; height: 80px" />
+        <div class="z-skel z-skel--btn" style="margin-top: 16px" />
       </div>
     </div>
 
-    <section class="section-box shop-template mb-50">
-      <div class="container">
-        <div v-if="!cart.items.length" class="text-center py-50">
-          <h3 class="mb-15">Your cart is empty</h3>
-          <p class="font-md color-gray-500 mb-25">Add products from the shop to continue.</p>
-          <router-link class="btn btn-buy" to="/shop">Continue shopping</router-link>
+    <div v-else-if="!cart.items.length" class="z-empty z-fade-item">
+      <h3>{{ t('cart.empty') }}</h3>
+      <p>{{ t('cart.emptyHint') }}</p>
+      <router-link class="z-btn z-btn-primary" to="/shop">{{ t('cart.continue') }}</router-link>
+    </div>
+
+    <div v-else class="z-cart-layout z-fade-item">
+      <div class="z-cart-layout__main">
+        <!-- Desktop table -->
+        <div class="z-table-wrap z-cart-desktop">
+          <table class="z-cart-table">
+            <thead>
+              <tr>
+                <th>{{ t('cart.product') }}</th>
+                <th>{{ t('cart.price') }}</th>
+                <th>{{ t('cart.qty') }}</th>
+                <th>{{ t('cart.subtotal') }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="line in cart.items" :key="lineKey(line)">
+                <td>
+                  <div class="z-cart-product">
+                    <router-link :to="`/product/${line.product.slug}`">
+                      <img :src="line.product.image" :alt="line.product.name" />
+                    </router-link>
+                    <div>
+                      <router-link class="z-cart-product__name" :to="`/product/${line.product.slug}`">
+                        {{ line.product.name }}
+                      </router-link>
+                      <p v-if="optionsLabel(line)" class="z-muted z-cart-product__opts">{{ optionsLabel(line) }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td><PriceDisplay :amount="line.product.price" :alt="false" /></td>
+                <td>
+                  <div class="z-qty">
+                    <button type="button" @click="cart.setQty(line.product.id, Math.max(1, line.qty - 1), line.options)">−</button>
+                    <input :value="line.qty" readonly />
+                    <button type="button" @click="cart.setQty(line.product.id, line.qty + 1, line.options)">+</button>
+                  </div>
+                </td>
+                <td><PriceDisplay :amount="line.product.price * line.qty" :alt="false" /></td>
+                <td>
+                  <button class="z-btn z-btn-text" type="button" @click="cart.remove(line.product.id, line.options)">
+                    {{ t('cart.remove') }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div v-else class="row">
-          <div class="col-lg-9">
-            <div class="box-carts">
-              <div class="head-wishlist">
-                <div class="item-wishlist">
-                  <div class="wishlist-product">
-                    <span class="font-md-bold color-brand-3">Product</span>
-                  </div>
-                  <div class="wishlist-price">
-                    <span class="font-md-bold color-brand-3">Unit Price</span>
-                  </div>
-                  <div class="wishlist-status">
-                    <span class="font-md-bold color-brand-3">Quantity</span>
-                  </div>
-                  <div class="wishlist-action">
-                    <span class="font-md-bold color-brand-3">Subtotal</span>
-                  </div>
-                  <div class="wishlist-remove">
-                    <span class="font-md-bold color-brand-3">Remove</span>
-                  </div>
-                </div>
+        <!-- Mobile cards -->
+        <div class="z-cart-mobile">
+          <article v-for="line in cart.items" :key="`m-${lineKey(line)}`" class="z-cart-line">
+            <router-link class="z-cart-line__img" :to="`/product/${line.product.slug}`">
+              <img :src="line.product.image" :alt="line.product.name" />
+            </router-link>
+            <div class="z-cart-line__body">
+              <router-link class="z-cart-line__name" :to="`/product/${line.product.slug}`">
+                {{ line.product.name }}
+              </router-link>
+              <p v-if="optionsLabel(line)" class="z-muted">{{ optionsLabel(line) }}</p>
+              <div class="z-cart-line__price">
+                <PriceDisplay :amount="line.product.price" :alt="false" />
               </div>
-
-              <div class="content-wishlist mb-20">
-                <div
-                  v-for="line in cart.items"
-                  :key="line.product.id"
-                  class="item-wishlist"
-                >
-                  <div class="wishlist-product">
-                    <div class="product-wishlist">
-                      <div class="product-image">
-                        <router-link :to="`/product/${line.product.slug}`">
-                          <img :src="line.product.image" :alt="line.product.name" />
-                        </router-link>
-                      </div>
-                      <div class="product-info">
-                        <router-link :to="`/product/${line.product.slug}`">
-                          <h6 class="color-brand-3">{{ line.product.name }}</h6>
-                        </router-link>
-                        <div class="rating">
-                          <img v-for="n in 5" :key="n" :src="star" alt="" />
-                          <span class="font-xs color-gray-500"> (65)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="wishlist-price">
-                    <h4 class="color-brand-3">${{ line.product.price.toFixed(2) }}</h4>
-                  </div>
-                  <div class="wishlist-status">
-                    <div class="box-quantity">
-                      <div class="input-quantity">
-                        <input
-                          class="font-xl color-brand-3"
-                          type="text"
-                          :value="line.qty"
-                          readonly
-                        />
-                        <span
-                          class="minus-cart"
-                          @click="cart.setQty(line.product.id, Math.max(1, line.qty - 1))"
-                        />
-                        <span
-                          class="plus-cart"
-                          @click="cart.setQty(line.product.id, line.qty + 1)"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div class="wishlist-action">
-                    <h4 class="color-brand-3">
-                      ${{ (line.product.price * line.qty).toFixed(2) }}
-                    </h4>
-                  </div>
-                  <div class="wishlist-remove">
-                    <a
-                      class="btn btn-delete"
-                      href="#"
-                      aria-label="Remove"
-                      @click.prevent="cart.remove(line.product.id)"
-                    />
-                  </div>
+              <div class="z-cart-line__row">
+                <div class="z-qty">
+                  <button type="button" @click="cart.setQty(line.product.id, Math.max(1, line.qty - 1), line.options)">−</button>
+                  <input :value="line.qty" readonly />
+                  <button type="button" @click="cart.setQty(line.product.id, line.qty + 1, line.options)">+</button>
                 </div>
+                <PriceDisplay :amount="line.product.price * line.qty" :alt="false" />
               </div>
-
-              <div class="row mb-40">
-                <div class="col-lg-6 col-md-6">
-                  <router-link class="btn btn-buy w-auto arrow-back mb-10" to="/shop">
-                    Continue shopping
-                  </router-link>
-                </div>
-                <div class="col-lg-6 col-md-6 text-md-end">
-                  <button class="btn btn-buy w-auto update-cart mb-10" type="button" @click="onUpdate">
-                    Update cart
-                  </button>
-                </div>
-              </div>
-
-              <div class="row mb-50">
-                <div class="col-lg-6 col-md-6 mb-20">
-                  <div class="box-cart-left">
-                    <h5 class="font-md-bold mb-10">Calculate Shipping</h5>
-                    <span class="font-sm-bold mb-5 d-inline-block color-gray-500">Delivery:</span>
-                    <span class="font-sm-bold d-inline-block color-brand-3"> Cambodia only · Free over $75</span>
-                    <div class="form-group mt-10">
-                      <select v-model="shipCountry" class="form-control select-style1 color-gray-700">
-                        <option value="kh">Cambodia</option>
-                      </select>
-                    </div>
-                    <div class="row">
-                      <div class="col-lg-6 mb-10">
-                        <input v-model="shipState" class="form-control" placeholder="Province / City (e.g. Phnom Penh)" />
-                      </div>
-                      <div class="col-lg-6 mb-10">
-                        <input v-model="shipZip" class="form-control" placeholder="PostCode / ZIP" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 mb-20">
-                  <div class="box-cart-right p-20">
-                    <h5 class="font-md-bold mb-10">Apply Coupon</h5>
-                    <span class="font-sm-bold mb-5 d-inline-block color-gray-500">
-                      Using A Promo Code?
-                    </span>
-                    <div class="form-group d-flex gap-2 mt-10">
-                      <input
-                        v-model="coupon"
-                        class="form-control mr-15"
-                        placeholder="Enter Your Coupon"
-                      />
-                      <button class="btn btn-buy w-auto" type="button" @click="onCoupon">
-                        Apply
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3">
-            <div class="box-cart-total">
-              <h5 class="font-md-bold mb-10">Cart totals</h5>
-              <div class="border-bottom mb-10 pb-10">
-                <div class="d-flex justify-content-between mb-10">
-                  <span class="font-sm color-gray-500">Subtotal</span>
-                  <strong class="font-md color-brand-3">${{ cart.subtotal.toFixed(2) }}</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-10">
-                  <span class="font-sm color-gray-500">Shipping</span>
-                  <span class="font-sm color-gray-900">
-                    {{ shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}` }}
-                  </span>
-                </div>
-                <div v-if="discount" class="d-flex justify-content-between">
-                  <span class="font-sm color-gray-500">Discount</span>
-                  <span class="font-sm color-brand-2">−${{ discount.toFixed(2) }}</span>
-                </div>
-              </div>
-              <div class="d-flex justify-content-between mb-20">
-                <span class="font-md-bold">Total</span>
-                <strong class="font-xl-bold color-brand-3">${{ total.toFixed(2) }}</strong>
-              </div>
-              <router-link class="btn btn-buy w-100" to="/checkout">Proceed to checkout</router-link>
-              <button class="btn btn-border w-100 mt-10" type="button" @click="cart.clear()">
-                Clear cart
+              <button class="z-btn z-btn-text z-cart-line__remove" type="button" @click="cart.remove(line.product.id, line.options)">
+                {{ t('cart.remove') }}
               </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="z-cart-actions">
+          <router-link class="z-btn z-btn-ghost" to="/shop">{{ t('cart.continue') }}</router-link>
+          <button class="z-btn z-btn-ghost" type="button" @click="cart.clear()">{{ t('cart.clear') }}</button>
+        </div>
+
+        <div class="z-cart-utils">
+          <div class="z-card z-cart-coupon">
+            <h4>{{ t('cart.coupon') }}</h4>
+            <p class="z-muted">{{ t('cart.couponHint') }}</p>
+            <div class="z-cart-utils__row">
+              <input v-model="coupon" class="z-input" placeholder="SAVE10" />
+              <button class="z-btn z-btn-primary" type="button" @click="onCoupon">{{ t('cart.apply') }}</button>
             </div>
           </div>
         </div>
       </div>
-    </section>
+
+      <aside class="z-card z-order-summary">
+        <h3>{{ t('cart.totals') }}</h3>
+        <div class="z-summary-row">
+          <span class="z-muted">{{ t('cart.subtotal') }}</span>
+          <PriceDisplay :amount="cart.subtotal" :alt="false" />
+        </div>
+        <div class="z-summary-row">
+          <span class="z-muted">{{ t('cart.shipping') }}</span>
+          <span v-if="shippingFee === 0">{{ t('cart.free') }}</span>
+          <PriceDisplay v-else :amount="shippingFee" :alt="false" />
+        </div>
+        <div v-if="discount" class="z-summary-row">
+          <span class="z-muted">{{ t('cart.discount') }}</span>
+          <PriceDisplay :amount="discount" :alt="false" />
+        </div>
+        <div class="z-summary-row z-summary-row--total">
+          <span>{{ t('cart.total') }}</span>
+          <PriceDisplay :amount="total" />
+        </div>
+        <router-link class="z-btn z-btn-deal z-btn-block" to="/checkout">{{ t('cart.checkout') }}</router-link>
+      </aside>
+    </div>
+
+    <TrustStrip />
   </main>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Notify } from 'quasar';
-import { ecom } from 'src/helper/ecomAssets';
-import { useCartStore } from 'stores/cart-store';
+import PriceDisplay from 'components/store/PriceDisplay.vue';
+import StoreCrumbs from 'components/store/StoreCrumbs.vue';
+import TrustStrip from 'components/home/TrustStrip.vue';
+import { useCartStore, type CartLine } from 'stores/cart-store';
 
+const { t } = useI18n();
 const cart = useCartStore();
-const star = ecom('imgs/template/icons/star.svg');
-
-const shipCountry = ref('kh');
-const shipState = ref('');
-const shipZip = ref('');
+const booting = ref(true);
 const coupon = ref('');
 const discount = ref(0);
-
 const shippingFee = computed(() => (cart.subtotal >= 75 ? 0 : 5));
 const total = computed(() => Math.max(0, cart.subtotal + shippingFee.value - discount.value));
 
-function onUpdate() {
-  Notify.create({ type: 'positive', message: 'Cart updated', position: 'top' });
+function lineKey(line: CartLine) {
+  const o = line.options || {};
+  return `${line.product.id}-${o.color || ''}-${o.style || ''}-${o.size || ''}`;
 }
+
+function optionsLabel(line: CartLine) {
+  const parts = [
+    line.options?.color,
+    line.options?.style,
+    line.options?.size,
+  ].filter(Boolean);
+  return parts.join(' · ');
+}
+
+onMounted(async () => {
+  await new Promise((r) => setTimeout(r, 300));
+  booting.value = false;
+});
 
 function onCoupon() {
   const code = coupon.value.trim().toUpperCase();
   if (code === 'SAVE10') {
     discount.value = Math.round(cart.subtotal * 0.1 * 100) / 100;
-    Notify.create({ type: 'positive', message: 'Coupon SAVE10 applied (−10%)', position: 'top' });
-  } else if (!code) {
-    Notify.create({ type: 'warning', message: 'Enter a coupon code', position: 'top' });
+    Notify.create({ type: 'positive', message: 'SAVE10 applied', position: 'top' });
   } else {
     discount.value = 0;
-    Notify.create({ type: 'warning', message: 'Invalid coupon (try SAVE10)', position: 'top' });
+    Notify.create({ type: 'warning', message: 'Use SAVE10', position: 'top' });
   }
 }
 </script>
-
-<style scoped>
-.input-quantity .minus-cart,
-.input-quantity .plus-cart {
-  cursor: pointer;
-}
-</style>
-

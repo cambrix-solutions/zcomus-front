@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from 'src/helper/api/apiConfig';
+import { endpoints, getApiBaseUrl } from 'src/helper/api/apiConfig';
 
 export interface ApiEnvelope<T = unknown> {
   status?: boolean;
@@ -25,7 +25,7 @@ export function resolveApiUrl(): string {
 
 export async function ensureCsrf(): Promise<void> {
   const base = resolveApiUrl();
-  await fetch(`${base}/sanctum/csrf-cookie`, {
+  await fetch(`${base}${endpoints.csrfCookie}`, {
     method: 'GET',
     credentials: 'include',
   }).catch(async () => {

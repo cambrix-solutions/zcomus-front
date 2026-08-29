@@ -34,7 +34,7 @@ export function getApiBaseUrl(): string {
 }
 
 export const endpoints = {
-  csrfCookie: '/sanctum/csrf-cookie',
+  csrfCookie: '/csrf-cookie',
   login: '/login',
   register: '/register',
   logout: '/logout',

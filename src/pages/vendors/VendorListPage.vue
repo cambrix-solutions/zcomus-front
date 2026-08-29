@@ -1,229 +1,170 @@
 <template>
-  <main class="main">
-    <div class="section-box">
-      <div class="breadcrumbs-div">
-        <div class="container">
-          <ul class="breadcrumb">
-            <li><router-link class="font-xs color-gray-1000" to="/">Home</router-link></li>
-            <li><span class="font-xs color-gray-500">Vendor listing</span></li>
-          </ul>
+  <main class="z-container z-page">
+    <StoreCrumbs :crumbs="[{ label: t('nav.vendors') }]" />
+
+    <div class="z-vendors-hero">
+      <div>
+        <p class="z-page-hero__kicker">Cambodia marketplace</p>
+        <h1>{{ t('nav.vendors') }}</h1>
+        <p class="z-muted">
+          Discover <strong>{{ vendors.length }}</strong> trusted local shops — electronics, fashion, and more.
+        </p>
+      </div>
+      <router-link class="z-btn z-btn-deal" to="/vendor">
+        <i class="material-icons">storefront</i>
+        {{ t('footer.openShop') }}
+      </router-link>
+    </div>
+
+    <div class="z-shop-layout">
+      <aside class="z-shop-layout__side d-none-xs">
+        <div class="z-shop-filters">
+          <div class="z-shop-filters__block">
+            <h6>Industry</h6>
+            <ul class="z-shop-filters__list">
+              <li>
+                <button type="button" :class="{ 'is-active': industry === 'all' }" @click="industry = 'all'">
+                  <span>All</span>
+                  <em>{{ vendors.length }}</em>
+                </button>
+              </li>
+              <li v-for="ind in industries" :key="ind.id">
+                <button type="button" :class="{ 'is-active': industry === ind.id }" @click="industry = ind.id">
+                  <span>{{ ind.name }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+      <div class="z-shop-layout__main">
+        <div class="z-vendor-toolbar">
+          <label class="z-vendor-toolbar__search">
+            <i class="material-icons">search</i>
+            <input v-model="search" type="search" placeholder="Search vendors…" />
+          </label>
+          <label class="z-shop-toolbar__control">
+            <span>Sort</span>
+            <select v-model="sort">
+              <option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </label>
+          <span class="z-vendor-toolbar__meta">{{ filtered.length }} shops</span>
+        </div>
+
+        <div class="z-vendor-industries d-only-xs">
+          <button type="button" :class="{ 'is-active': industry === 'all' }" @click="industry = 'all'">All</button>
+          <button
+            v-for="ind in industries"
+            :key="ind.id"
+            type="button"
+            :class="{ 'is-active': industry === ind.id }"
+            @click="industry = ind.id"
+          >
+            {{ ind.name }}
+          </button>
+        </div>
+
+        <div v-if="booting" class="z-vendor-grid">
+          <div v-for="n in 6" :key="n" class="z-skel-vendor z-fade-item" :style="{ '--i': n }">
+            <div class="z-skel z-skel-vendor__cover" />
+            <div class="z-skel z-skel-vendor__logo" />
+            <div class="z-skel-vendor__body">
+              <div class="z-skel z-skel--md" style="width: 60%; margin: 0 auto" />
+              <div class="z-skel z-skel--sm" style="width: 80%; margin: 8px auto 0" />
+              <div class="z-skel z-skel--pill" style="margin: 12px auto 0" />
+            </div>
+          </div>
+        </div>
+        <div v-else-if="!filtered.length" class="z-empty">No vendors match.</div>
+        <div v-else class="z-vendor-grid">
+          <router-link
+            v-for="(v, i) in filtered"
+            :key="v.slug"
+            class="z-vendor-card z-vendor-card--rich z-fade-item"
+            :style="{ '--i': Math.min(i, 8) }"
+            :to="`/vendors/${v.slug}`"
+          >
+            <div class="z-vendor-card__cover">
+              <div class="z-vendor-card__cover-media">
+                <img class="cover" :src="v.cover" :alt="v.name" />
+              </div>
+              <img v-if="v.logo" class="logo" :src="v.logo" :alt="`${v.name} logo`" />
+              <span class="z-vendor-card__count">{{ v.products }} items</span>
+            </div>
+            <div class="z-vendor-card__body">
+              <h3>{{ v.name }}</h3>
+              <p class="z-stars">★★★★★ <span>({{ v.reviews }})</span></p>
+              <p class="z-vendor-card__meta">
+                <i class="material-icons">place</i>
+                <span>{{ shortAddress(v.address) }}</span>
+              </p>
+              <p class="z-vendor-card__meta">
+                <i class="material-icons">call</i>
+                <span>{{ v.phone }}</span>
+              </p>
+              <span class="z-btn z-btn-deal z-btn-sm z-btn-block">
+                {{ t('home.visitShop') }}
+                <i class="material-icons">arrow_forward</i>
+              </span>
+            </div>
+          </router-link>
         </div>
       </div>
     </div>
 
-    <section class="section-box shop-template mt-0 mb-50">
-      <div class="container">
-        <h2>Vendors Listing</h2>
-        <div class="row align-items-center">
-          <div class="col-lg-6 mb-30">
-            <p class="font-md color-gray-500">
-              We have
-              <span class="font-md-bold color-brand-3"> {{ vendors.length }}</span>
-              <span> vendors now</span>
-            </p>
-          </div>
-          <div class="col-lg-6 mb-30 text-end">
-            <router-link class="font-sm color-gray-900 mr-30" to="/contact">
-              Support Ticket
-            </router-link>
-            <router-link class="font-sm color-gray-900 mr-30" to="/about">
-              Become an Affilate
-            </router-link>
-            <router-link class="btn btn-buy w-auto font-sm-bold" to="/register">
-              Open a Shop
-            </router-link>
-          </div>
-        </div>
-        <div class="border-bottom pt-0 mb-30" />
-
-        <div class="row">
-          <div class="col-lg-9 order-first order-lg-last">
-            <div class="box-filters mt-0 pb-5 border-bottom">
-              <div class="row align-items-center">
-                <div class="col-lg-5 mb-10">
-                  <input
-                    v-model="search"
-                    class="form-control"
-                    type="search"
-                    placeholder="Search vendors…"
-                  />
-                </div>
-                <div class="col-lg-7 mb-10 text-lg-end text-center">
-                  <span class="font-sm color-gray-900 font-medium border-1-right span">
-                    Showing {{ filtered.length }} of {{ vendors.length }} results
-                  </span>
-                  <div class="d-inline-block">
-                    <span class="font-sm color-gray-500 font-medium">Sort by:</span>
-                    <div class="dropdown dropdown-sort border-1-right" :class="{ show: sortOpen }">
-                      <button
-                        class="btn dropdown-toggle font-sm color-gray-900 font-medium"
-                        type="button"
-                        @click="sortOpen = !sortOpen"
-                      >
-                        {{ sortLabel }}
-                      </button>
-                      <ul
-                        class="dropdown-menu dropdown-menu-light"
-                        :class="{ show: sortOpen }"
-                        style="margin: 0"
-                      >
-                        <li v-for="opt in sortOptions" :key="opt.value">
-                          <a
-                            class="dropdown-item"
-                            :class="{ active: sort === opt.value }"
-                            href="#"
-                            @click.prevent="setSort(opt.value)"
-                          >
-                            {{ opt.label }}
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="!filtered.length" class="py-50 text-center color-gray-500">
-              No vendors match your search.
-            </div>
-
-            <div v-else class="row mt-20">
-              <div
-                v-for="v in filtered"
-                :key="v.slug"
-                class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12"
-              >
-                <div class="card-vendor">
-                  <div class="card-top-vendor">
-                    <div class="card-top-vendor-left">
-                      <router-link :to="`/vendors/${v.slug}`">
-                        <img :src="v.logo" :alt="v.name" />
-                      </router-link>
-                      <div class="rating">
-                        <img v-for="n in 5" :key="n" :src="star" alt="" />
-                        <span class="font-xs color-gray-500"> ({{ v.reviews }})</span>
-                      </div>
-                    </div>
-                    <div class="card-top-vendor-right">
-                      <router-link class="btn btn-gray" :to="`/vendors/${v.slug}`">
-                        {{ v.products }} Products
-                      </router-link>
-                      <p class="font-xs color-gray-500 mt-10">
-                        Member since {{ v.memberSince }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="card-bottom-vendor">
-                    <p class="font-sm color-gray-500 location mb-10">{{ v.address }}</p>
-                    <p class="font-sm color-gray-500 phone">{{ v.phone }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <aside class="col-lg-3 order-last order-lg-first mt-30 mt-lg-0">
-            <div class="sidebar-border">
-              <div class="sidebar-head">
-                <h6 class="color-gray-900">Vendor by industry</h6>
-              </div>
-              <div class="sidebar-content">
-                <ul class="list-nav-arrow">
-                  <li>
-                    <a
-                      href="#"
-                      :class="{ active: industry === 'all' }"
-                      @click.prevent="industry = 'all'"
-                    >
-                      All industries
-                      <span class="number">{{ vendors.length }}</span>
-                    </a>
-                  </li>
-                  <li v-for="ind in industries" :key="ind.id">
-                    <a
-                      href="#"
-                      :class="{ active: industry === ind.id }"
-                      @click.prevent="industry = ind.id"
-                    >
-                      {{ ind.name }}
-                      <span class="number">{{ countByIndustry(ind.id) }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="box-slider-item mt-30 mb-30">
-              <div class="head pb-15 border-brand-2">
-                <h5 class="color-gray-900">Popular tags</h5>
-              </div>
-              <div class="content-slider">
-                <a
-                  v-for="tag in tags"
-                  :key="tag"
-                  class="btn btn-border mr-5 mb-10"
-                  href="#"
-                  @click.prevent="search = tag"
-                >
-                  {{ tag }}
-                </a>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
+    <TrustStrip />
   </main>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import StoreCrumbs from 'components/store/StoreCrumbs.vue';
+import TrustStrip from 'components/home/TrustStrip.vue';
 import { mockVendors, vendorIndustries } from 'src/data/mock-vendors';
-import { ecom } from 'src/helper/ecomAssets';
+import { liveShopToVendor } from 'src/data/vendor-store';
+import { useSellerShop } from 'src/composables/useSellerShop';
+import { useBootLoad } from 'src/composables/useBootLoad';
 
-const star = ecom('imgs/template/icons/star.svg');
-const vendors = mockVendors;
+const { t } = useI18n();
+const { shop, listingCount } = useSellerShop();
+const vendors = computed(() => {
+  if (!shop.active || !shop.name.trim()) return mockVendors;
+  const live = liveShopToVendor(shop, listingCount.value);
+  const rest = mockVendors.filter((v) => v.slug !== live.slug);
+  return [live, ...rest];
+});
 const industries = vendorIndustries.filter((i) => i.id !== 'all');
-const tags = ['Games', 'Electronics', 'Video', 'Cellphone', 'Laptop', 'Camera', 'USB'];
-
 const search = ref('');
 const industry = ref('all');
 const sort = ref('latest');
-const sortOpen = ref(false);
-
+const { booting } = useBootLoad(undefined, 350);
 const sortOptions = [
-  { value: 'latest', label: 'Latest added' },
-  { value: 'oldest', label: 'Oldest added' },
+  { value: 'latest', label: 'Latest' },
+  { value: 'oldest', label: 'Oldest' },
   { value: 'products', label: 'Most products' },
   { value: 'name', label: 'Name A–Z' },
 ];
 
-const sortLabel = computed(
-  () => sortOptions.find((o) => o.value === sort.value)?.label ?? 'Latest added',
-);
-
-function countByIndustry(id: string) {
-  return vendors.filter((v) => v.industry === id).length;
+function shortAddress(address: string) {
+  const parts = address.split(',');
+  return parts.slice(-2).join(',').trim() || address;
 }
 
 const filtered = computed(() => {
-  let list = [...vendors];
-  if (industry.value !== 'all') {
-    list = list.filter((v) => v.industry === industry.value);
-  }
+  let list = [...vendors.value];
+  if (industry.value !== 'all') list = list.filter((v) => v.industry === industry.value);
   if (search.value.trim()) {
     const q = search.value.toLowerCase();
     list = list.filter(
-      (v) =>
-        v.name.toLowerCase().includes(q) ||
-        v.address.toLowerCase().includes(q) ||
-        v.industry.toLowerCase().includes(q),
+      (v) => v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q) || v.phone.includes(q),
     );
   }
   switch (sort.value) {
     case 'oldest':
-      list.sort((a, b) => a.memberSince - b.memberSince);
+      list.reverse();
       break;
     case 'products':
       list.sort((a, b) => b.products - a.products);
@@ -232,34 +173,8 @@ const filtered = computed(() => {
       list.sort((a, b) => a.name.localeCompare(b.name));
       break;
     default:
-      list.sort((a, b) => b.memberSince - a.memberSince || b.products - a.products);
+      break;
   }
   return list;
 });
-
-function setSort(value: string) {
-  sort.value = value;
-  sortOpen.value = false;
-}
-
-function onDocClick(e: MouseEvent) {
-  const t = e.target as HTMLElement | null;
-  if (!t?.closest('.dropdown-sort')) sortOpen.value = false;
-}
-
-onMounted(() => document.addEventListener('click', onDocClick));
-onUnmounted(() => document.removeEventListener('click', onDocClick));
 </script>
-
-<style scoped>
-.list-nav-arrow a.active {
-  color: var(--color-brand-2, #fd9636);
-  font-weight: 600;
-}
-.dropdown-sort .dropdown-menu.show {
-  display: block;
-}
-.card-vendor {
-  margin-bottom: 20px;
-}
-</style>

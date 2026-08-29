@@ -1,132 +1,139 @@
 <template>
-  <main class="main">
-    <section class="section-box shop-template mt-60 mb-50">
-      <div class="container">
-        <div class="row mb-100">
-          <div class="col-lg-1" />
-          <div class="col-lg-5">
-            <h3>Create an account</h3>
-            <p class="font-md color-gray-500">Access to all features. No credit card required.</p>
-            <div v-if="auth.error" class="alert alert-danger mt-20 font-sm">{{ auth.error }}</div>
-            <form class="form-register mt-30 mb-30" @submit.prevent="onSubmit">
-              <div class="form-group">
-                <label class="mb-5 font-sm color-gray-700">Full Name *</label>
-                <input v-model="name" class="form-control" type="text" placeholder="Steven job" required />
-              </div>
-              <div class="form-group">
-                <label class="mb-5 font-sm color-gray-700">Email *</label>
-                <input
-                  v-model="email"
-                  class="form-control"
-                  type="email"
-                  placeholder="stevenjob@gmail.com"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="mb-5 font-sm color-gray-700">Username *</label>
-                <input v-model="username" class="form-control" type="text" placeholder="stevenjob" required />
-              </div>
-              <div class="form-group">
-                <label class="mb-5 font-sm color-gray-700">Password *</label>
-                <input
-                  v-model="password"
-                  class="form-control"
-                  type="password"
-                  placeholder="******************"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="mb-5 font-sm color-gray-700">Re-Password *</label>
-                <input
-                  v-model="passwordConfirmation"
-                  class="form-control"
-                  type="password"
-                  placeholder="******************"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="font-sm color-gray-700">
-                  <input v-model="agree" class="checkagree" type="checkbox" required />
-                  By clicking Register button, you agree our
-                  <router-link class="color-brand-2" to="/terms">terms and policy</router-link>,
-                </label>
-              </div>
-              <div class="form-group">
-                <button class="font-md-bold btn btn-buy" type="submit" :disabled="auth.loading">
-                  {{ auth.loading ? 'Creating…' : 'Sign Up' }}
-                </button>
-              </div>
-              <div class="mt-20">
-                <span class="font-xs color-gray-500 font-medium">Already have an account?</span>
-                <router-link class="font-xs color-brand-3 font-medium" to="/login">
-                  Sign In
-                </router-link>
-              </div>
-            </form>
+  <div class="z-container z-page z-page--auth">
+    <div class="z-auth-shell z-auth-shell--register">
+      <aside class="z-auth-panel z-auth-panel--deal">
+        <p class="z-page-hero__kicker">{{ t('auth.joinKicker') }}</p>
+        <h1>{{ t('auth.createTitle') }}</h1>
+        <p class="z-muted">{{ t('auth.createSub') }}</p>
+        <ul class="z-auth-perks">
+          <li>
+            <i class="material-icons">storefront</i>
+            <span>{{ t('auth.perkSell') }}</span>
+          </li>
+          <li>
+            <i class="material-icons">shopping_bag</i>
+            <span>{{ t('auth.perkShop') }}</span>
+          </li>
+          <li>
+            <i class="material-icons">verified</i>
+            <span>{{ t('auth.perkTrust') }}</span>
+          </li>
+        </ul>
+        <div class="z-auth-panel__foot">
+          <p class="z-muted">{{ t('auth.hasAccount') }}</p>
+          <router-link class="z-btn z-btn-ghost z-btn-sm" to="/login">{{ t('nav.login') }}</router-link>
+        </div>
+      </aside>
+
+      <div class="z-auth-form">
+        <div v-if="auth.error" class="z-alert">{{ auth.error }}</div>
+        <form @submit.prevent="onSubmit">
+          <div class="z-field">
+            <label class="z-label" for="reg-name">{{ t('auth.name') }}</label>
+            <div class="z-input-wrap">
+              <i class="material-icons">person_outline</i>
+              <input id="reg-name" v-model="name" class="z-input" required :placeholder="t('auth.namePh')" />
+            </div>
           </div>
-          <div class="col-lg-5">
-            <div class="box-login-social pt-65 pl-50">
-              <h5 class="text-center">Use Social Network Account</h5>
-              <div class="box-button-login mt-25">
-                <a class="btn btn-login font-md-bold color-brand-3 mb-15" href="#" @click.prevent>
-                  Sign up with
-                  <img :src="google" alt="Google" />
-                </a>
-                <a class="btn btn-login font-md-bold color-brand-3 mb-15" href="#" @click.prevent>
-                  Sign up with
-                  <span class="color-blue font-md-bold">Facebook</span>
-                </a>
-                <a class="btn btn-login font-md-bold color-brand-3 mb-15" href="#" @click.prevent>
-                  Sign up with
-                  <img :src="amazon" alt="Amazon" />
-                </a>
+          <div class="z-field">
+            <label class="z-label" for="reg-email">{{ t('auth.email') }}</label>
+            <div class="z-input-wrap">
+              <i class="material-icons">mail_outline</i>
+              <input
+                id="reg-email"
+                v-model="email"
+                class="z-input"
+                type="email"
+                autocomplete="email"
+                required
+                :placeholder="t('auth.emailPh')"
+              />
+            </div>
+          </div>
+          <div class="z-auth-form__grid">
+            <div class="z-field">
+              <label class="z-label" for="reg-pass">{{ t('auth.password') }}</label>
+              <div class="z-input-wrap">
+                <i class="material-icons">lock_outline</i>
+                <input
+                  id="reg-pass"
+                  v-model="password"
+                  class="z-input"
+                  :type="showPass ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  required
+                />
               </div>
-              <div class="mt-10 text-center">
-                <span class="font-xs color-gray-900">Buying for work?</span>
-                <a class="color-brand-1 font-xs" href="#" @click.prevent>Create a free business account</a>
+            </div>
+            <div class="z-field">
+              <label class="z-label" for="reg-pass2">{{ t('auth.confirm') }}</label>
+              <div class="z-input-wrap">
+                <i class="material-icons">lock_outline</i>
+                <input
+                  id="reg-pass2"
+                  v-model="passwordConfirmation"
+                  class="z-input"
+                  :type="showPass ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  required
+                />
               </div>
             </div>
           </div>
-        </div>
+
+          <label class="z-check" style="margin-bottom: 14px">
+            <input v-model="agree" type="checkbox" required />
+            <span>
+              {{ t('auth.agree') }}
+              <router-link to="/terms">{{ t('auth.terms') }}</router-link>
+            </span>
+          </label>
+
+          <button class="z-btn z-btn-deal z-btn-block" type="submit" :disabled="auth.loading">
+            <span v-if="auth.loading" class="z-auth-spinner" aria-hidden="true" />
+            {{ auth.loading ? t('auth.creating') : t('auth.signUp') }}
+          </button>
+        </form>
+
+        <p class="z-auth-form__mobile-link z-muted">
+          {{ t('auth.hasAccount') }}
+          <router-link to="/login">{{ t('nav.login') }}</router-link>
+        </p>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Notify } from 'quasar';
-import { ecom } from 'src/helper/ecomAssets';
 import { useAuthStore } from 'stores/auth-store';
 
+const { t } = useI18n();
 const auth = useAuthStore();
 const router = useRouter();
 const name = ref('');
 const email = ref('');
-const username = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
 const agree = ref(false);
-const google = ecom('imgs/page/account/google.svg');
-const amazon = ecom('imgs/page/account/amazon.svg');
+const showPass = ref(false);
 
 async function onSubmit() {
   if (password.value !== passwordConfirmation.value) {
-    Notify.create({ type: 'negative', message: 'Passwords do not match', position: 'top' });
+    Notify.create({ type: 'negative', message: t('auth.passMismatch'), position: 'top' });
     return;
   }
   try {
     await auth.register({
-      name: name.value || username.value,
+      name: name.value,
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value,
     });
-    Notify.create({ type: 'positive', message: 'Account created', position: 'top' });
+    Notify.create({ type: 'positive', message: t('success'), position: 'top' });
     void router.push('/account');
   } catch {
     /* store sets error */

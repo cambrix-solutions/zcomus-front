@@ -1,0 +1,297 @@
+/* ===== Vendor Center — Listings panel ===== */
+.z-listings-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.z-listings-panel .z-studio-toolbar h1 {
+  margin: 0;
+}
+
+.z-listings-panel .z-seller-tabs--status {
+  margin-bottom: 0;
+}
+
+/* View toggle — grid | list */
+.z-listings-view {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 12px;
+  background: #efeae3;
+  border: 1px solid rgba(58, 50, 46, 0.08);
+  flex-shrink: 0;
+}
+
+.z-listings-view__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--z-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+}
+
+.z-listings-view__btn .material-icons {
+  font-size: 18px;
+}
+
+.z-listings-view__btn.is-active {
+  background: #fff;
+  color: var(--z-ink);
+  box-shadow: 0 1px 4px rgba(58, 50, 46, 0.1);
+}
+
+/* Grid view (default desktop) */
+@media (min-width: 900px) {
+  .z-listings-panel.is-grid-view .z-studio-catalog {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+}
+
+/* List view — horizontal product rows */
+.z-listings-panel.is-list-view .z-studio-catalog {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product {
+  flex-direction: row;
+  align-items: stretch;
+  border-radius: 16px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__media {
+  flex: 0 0 clamp(96px, 28vw, 128px);
+  width: clamp(96px, 28vw, 128px);
+  aspect-ratio: auto;
+  align-self: stretch;
+  min-height: 112px;
+  border-right: 1px solid rgba(58, 50, 46, 0.06);
+  background: linear-gradient(180deg, #f4f9fd 0%, #fff 100%);
+}
+
+.z-listings-panel.is-list-view .z-studio-product__media img {
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__badge {
+  top: 6px;
+  left: 6px;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__status {
+  left: 6px;
+  bottom: 6px;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__shots {
+  right: 4px;
+  bottom: 4px;
+  min-width: 20px;
+  height: 20px;
+  font-size: 0.65rem;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__body {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 12px 12px 10px;
+  gap: 6px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__cat {
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+.z-listings-panel.is-list-view .z-studio-product h3 {
+  font-size: 1rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__meta {
+  margin-top: 2px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__meta strong {
+  font-size: 1.08rem;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__meta span {
+  font-size: 0.8rem;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__opts {
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__opts em {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__actions .z-btn-deal {
+  grid-column: 1 / -1;
+  min-height: 42px;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.z-listings-panel.is-list-view .z-studio-product__actions .z-btn-ghost {
+  min-height: 40px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  justify-content: center;
+  padding-inline: 8px;
+}
+
+/* Mobile grid override when user picks grid */
+@media (max-width: 899px) {
+  .z-listings-panel.is-grid-view .z-studio-catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .z-listings-panel.is-grid-view .z-studio-product {
+    flex-direction: column;
+  }
+
+  .z-listings-panel.is-grid-view .z-studio-product__media {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 0;
+    border-right: 0;
+  }
+
+  .z-listings-panel.is-grid-view .z-studio-product__actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .z-listings-panel.is-grid-view .z-studio-product__actions .z-btn-deal {
+    grid-column: auto;
+  }
+}
+
+/* Tablet + mobile toolbar */
+@media (max-width: 899px) {
+  .z-listings-panel .z-studio-toolbar h1 {
+    display: none;
+  }
+
+  .z-listings-panel .z-studio-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .z-listings-panel .z-studio-toolbar__tools {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .z-listings-panel .z-studio-toolbar .z-seller-search {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .z-listings-panel .z-studio-toolbar__tools .z-seller-filter {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .z-listings-panel .z-studio-toolbar__tools select:last-of-type {
+    display: none;
+  }
+
+  .z-listings-panel .z-listings-view {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .z-listings-panel .z-listings-view__btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .z-listings-panel .z-seller-tabs--status {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .z-listings-panel .z-seller-tabs--status::-webkit-scrollbar {
+    display: none;
+  }
+
+  .z-listings-panel .z-seller-tabs--status button {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 719px) {
+  .z-listings-panel {
+    gap: 12px;
+  }
+
+  .z-listings-panel .z-studio-toolbar__tools .z-seller-filter {
+    font-size: 0.88rem;
+  }
+
+  .z-listings-panel .z-seller-tabs--status button {
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+
+  .z-listings-view__btn span {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .z-listings-view__btn span {
+    display: inline;
+  }
+}

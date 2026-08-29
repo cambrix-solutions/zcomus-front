@@ -1,24 +1,19 @@
 <template>
-  <div>
-    <span class="bytext color-gray-500 font-xs font-medium">by</span>
-    <router-link
-      class="byAUthor color-gray-900 font-xs font-medium"
-      :to="`/vendors/${vendorSlug}`"
-    >
-      {{ product.brand }}
+  <div class="z-pdp-meta">
+    <span class="z-pdp-meta__brand">{{ product.brand }}</span>
+    <div class="z-stars">★★★★★ <span>(65)</span></div>
+    <router-link class="z-pdp-meta__vendor" :to="`/vendors/${slug}`">
+      Sold by {{ vendorLabel }}
     </router-link>
-    <div class="rating mt-5">
-      <img v-for="n in 5" :key="n" :src="star" alt="" />
-      <span class="font-xs color-gray-500 font-medium"> (65 reviews)</span>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Product } from 'src/data/mock-catalog';
-import { ecom } from 'src/helper/ecomAssets';
 
-defineProps<{ product: Product; vendorSlug?: string }>();
+const props = defineProps<{ product: Product; vendorSlug?: string }>();
 
-const star = ecom('imgs/template/icons/star.svg');
+const slug = computed(() => props.vendorSlug || props.product.vendor_slug || 'fasfox');
+const vendorLabel = computed(() => props.product.vendor_name || props.product.brand);
 </script>

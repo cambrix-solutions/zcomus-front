@@ -1,78 +1,91 @@
 <template>
-  <div class="home-page home-2">
+  <div class="z-page z-page--home">
     <HeroBanner />
-    <BrandStrip />
-    <FeaturedCategories :categories="catalog.categories" />
-    <ProductTabsSection
-      title="Flash Deals"
-      subtitle="Special products in this month."
-      :products="catalog.flashProducts"
-      flash
-      @add="onAdd"
-      @open="onOpen"
-    />
-    <ProductTabsSection
-      title="Trending Products"
-      subtitle="Special products in this month."
-      :products="catalog.trendingProducts"
-      class="pt-70"
-      @add="onAdd"
-      @open="onOpen"
-    />
+    <QuickPerks />
+    <FeaturedCategories :categories="catalog.categories" :loading="booting" />
     <PromoBanners />
-    <TopSelling
+    <ProductTabsSection
+      :title="t('home.topSelling')"
+      :subtitle="t('home.topSellingSub')"
       :products="catalog.topSellingProducts"
+      :loading="booting"
+      view-all="/shop"
       @add="onAdd"
       @open="onOpen"
+      @quickview="onQuickview"
     />
-    <TopBrands :brands="catalog.brands" />
-    <ProductColumns :columns="columns" @open="onOpen" />
-    <AdBanner />
-    <HomeNewsletter />
+    <ProductTabsSection
+      :title="t('home.flash')"
+      :subtitle="t('home.flashSub')"
+      :products="catalog.flashProducts"
+      :loading="booting"
+      flash
+      view-all="/shop?tab=flash"
+      @add="onAdd"
+      @open="onOpen"
+      @quickview="onQuickview"
+    />
+    <ProductTabsSection
+      :title="t('home.trending')"
+      :subtitle="t('home.trendingSub')"
+      :products="catalog.trendingProducts"
+      :loading="booting"
+      muted
+      view-all="/shop"
+      @add="onAdd"
+      @open="onOpen"
+      @quickview="onQuickview"
+    />
+    <VendorSpotlight :loading="booting" />
+    <PaymentStrip />
+    <TrustStrip />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Notify } from 'quasar';
-import { storeToRefs } from 'pinia';
 import HeroBanner from 'components/home/HeroBanner.vue';
-import BrandStrip from 'components/home/BrandStrip.vue';
+import QuickPerks from 'components/home/QuickPerks.vue';
+import PromoBanners from 'components/home/PromoBanners.vue';
 import FeaturedCategories from 'components/home/FeaturedCategories.vue';
 import ProductTabsSection from 'components/home/ProductTabsSection.vue';
-import PromoBanners from 'components/home/PromoBanners.vue';
-import TopSelling from 'components/home/TopSelling.vue';
-import TopBrands from 'components/home/TopBrands.vue';
-import ProductColumns from 'components/home/ProductColumns.vue';
-import AdBanner from 'components/home/AdBanner.vue';
-import HomeNewsletter from 'components/home/HomeNewsletter.vue';
+import VendorSpotlight from 'components/home/VendorSpotlight.vue';
+import PaymentStrip from 'components/home/PaymentStrip.vue';
+import TrustStrip from 'components/home/TrustStrip.vue';
 import type { Product } from 'src/data/mock-catalog';
 import { useCartStore } from 'stores/cart-store';
 import { useCatalogStore } from 'stores/catalog-store';
+import { useUiStore } from 'stores/ui-store';
 
+const { t } = useI18n();
 const router = useRouter();
 const cart = useCartStore();
 const catalog = useCatalogStore();
-const { topSellingProducts, trendingProducts, products } = storeToRefs(catalog);
-
-const columns = computed(() => [
-  { title: 'Best seller', products: topSellingProducts.value.slice(0, 3) },
-  { title: 'Featured products', products: products.value.slice(0, 3) },
-  { title: 'New arrivals', products: trendingProducts.value.slice(0, 3) },
-  { title: 'Top rated', products: topSellingProducts.value.slice(0, 3).reverse() },
-]);
+const ui = useUiStore();
+const booting = ref(true);
 
 function onAdd(product: Product) {
   cart.add(product);
-  Notify.create({ type: 'positive', message: 'Added to cart', position: 'top' });
+  Notify.create({ type: 'positive', message: t('product.addCart'), position: 'top' });
 }
 
 function onOpen(product: Product) {
   void router.push(`/product/${product.slug || product.id}`);
 }
 
-onMounted(() => {
-  void catalog.loadHomeCatalog();
+function onQuickview(product: Product) {
+  ui.openQuickview(product);
+}
+
+onMounted(async () => {
+  const started = Date.now();
+  await catalog.loadHomeCatalog();
+  // Keep skeleton visible briefly so the load state is noticeable
+  const wait = Math.max(0, 450 - (Date.now() - started));
+  if (wait) await new Promise((r) => setTimeout(r, wait));
+  booting.value = false;
 });
 </script>

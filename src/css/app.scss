@@ -1,24 +1,9 @@
-/* Storefront uses Ecom CSS from /ecom/assets/css/style.css */
-
-#q-app {
-  min-height: 100vh;
-}
-
-body {
-  margin: 0;
-  background: #fff;
-}
-
-/* Auth cards (fallback if Ecom form styles miss) */
-.z-auth-page {
-  min-height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 16px;
-}
-
-.z-auth-card {
-  width: 100%;
-  max-width: 480px;
-}
+@import './zcomus.scss';
+@import './vendor-hub.scss';
+@import './vendor-listing-dialog.scss'; /* listing dialog */
+@import './vendor-listings.scss';
+@import './vendor-analytics.scss';
+@import './vendor-payouts.scss';
+@import './vendor-orders.scss';
+@import './vendor-settings.scss';
+@import './admin-hub.scss';

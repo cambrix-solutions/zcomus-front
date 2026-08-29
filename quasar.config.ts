@@ -31,8 +31,7 @@ export default defineConfig((ctx) => {
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
+      // 'roboto-font', // disabled — site uses Plus Jakarta Sans + Kantumruy Pro
       'material-icons', // optional, you are not bound to it
     ],
 

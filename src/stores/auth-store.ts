@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
   apiRequest,
   ensureCsrf,
@@ -7,12 +7,18 @@ import {
   type ApiEnvelope,
 } from 'src/helper/api/apiClient';
 import { endpoints } from 'src/helper/api/apiConfig';
+import {
+  homePathForRole,
+  isAdminRole,
+  isSuperAdminRole,
+  type AuthRole,
+} from 'src/helper/authRoles';
 
 export interface AuthUser {
   id: number;
   name: string;
   email: string;
-  role?: string;
+  role?: AuthRole;
 }
 
 const STORAGE_KEY = 'zcomus-auth-user';
@@ -112,6 +118,26 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
   }
 
+  function loginDemoAdmin() {
+    persist({
+      id: 90,
+      name: 'Platform Admin',
+      email: 'admin@zcomus.test',
+      role: 'admin',
+    });
+    error.value = null;
+  }
+
+  function loginDemoSuperAdmin() {
+    persist({
+      id: 91,
+      name: 'Super Admin',
+      email: 'super@zcomus.test',
+      role: 'super_admin',
+    });
+    error.value = null;
+  }
+
   async function fetchUser() {
     try {
       const res = await apiRequest<AuthUser>(endpoints.user);
@@ -123,5 +149,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, loading, error, login, register, logout, loginDemo, fetchUser };
+  const role = computed(() => user.value?.role ?? null);
+  const isAdmin = computed(() => isAdminRole(role.value));
+  const isSuperAdmin = computed(() => isSuperAdminRole(role.value));
+  const canAccessAdmin = computed(() => isAdmin.value);
+  const postLoginPath = computed(() => homePathForRole(role.value));
+
+  return {
+    user,
+    loading,
+    error,
+    role,
+    isAdmin,
+    isSuperAdmin,
+    canAccessAdmin,
+    postLoginPath,
+    login,
+    register,
+    logout,
+    loginDemo,
+    loginDemoAdmin,
+    loginDemoSuperAdmin,
+    fetchUser,
+  };
 });

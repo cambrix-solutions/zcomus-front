@@ -1,149 +1,138 @@
 <template>
-  <div class="ecom-admin-root">
-    <div class="screen-overlay" :class="{ show: asideOpen }" @click="asideOpen = false" />
-    <aside class="navbar-aside" :class="{ show: asideOpen }">
-      <div class="aside-top">
-        <router-link class="brand-wrap" to="/admin">
-          <img class="logo" :src="logo" alt="Zcomus Admin" />
-        </router-link>
+  <div class="z-ahub" :class="{ 'is-nav-open': mobileNavOpen }">
+    <div v-if="mobileNavOpen" class="z-ahub__scrim" @click="mobileNavOpen = false" />
+
+    <aside class="z-ahub__sidebar">
+      <router-link class="z-ahub__brand" to="/admin" @click="mobileNavOpen = false">
+        <span class="z-ahub__brand-mark">Z</span>
         <div>
-          <button class="btn btn-icon btn-aside-minimize" type="button" @click="asideOpen = false">
-            <i class="text-muted material-icons md-menu_open" />
-          </button>
+          <strong>Zcomus</strong>
+          <small>{{ t('admin.center') }}</small>
         </div>
+      </router-link>
+
+      <div class="z-ahub__user-card">
+        <em>{{ userInitial }}</em>
+        <div>
+          <strong>{{ auth.user?.name || t('admin.staff') }}</strong>
+          <span>{{ roleLabel }}</span>
+        </div>
+        <i class="z-ahub__role-pill" :class="{ 'is-super': auth.isSuperAdmin }">
+          {{ auth.isSuperAdmin ? t('admin.roleSuper') : t('admin.roleAdmin') }}
+        </i>
       </div>
-      <nav>
-        <ul class="menu-aside">
-          <li
-            v-for="item in menu"
-            :key="item.to"
-            class="menu-item"
-            :class="{ active: isActive(item.to) }"
-          >
-            <router-link class="menu-link" :to="item.to" @click="asideOpen = false">
-              <i class="icon material-icons" :class="item.icon" />
-              <span class="text">{{ item.label }}</span>
-            </router-link>
-          </li>
-        </ul>
-        <hr />
-        <ul class="menu-aside">
-          <li class="menu-item">
-            <router-link class="menu-link" to="/" @click="asideOpen = false">
-              <i class="icon material-icons md-storefront" />
-              <span class="text">View storefront</span>
-            </router-link>
-          </li>
-        </ul>
+
+      <nav class="z-ahub__nav" aria-label="Admin navigation">
+        <router-link
+          v-for="item in menu"
+          :key="item.to"
+          :to="item.to"
+          :class="{ 'is-active': isActive(item.to) }"
+          @click="mobileNavOpen = false"
+        >
+          <i class="material-icons">{{ item.icon }}</i>
+          <span>{{ item.label }}</span>
+          <b v-if="item.badge">{{ item.badge }}</b>
+        </router-link>
       </nav>
+
+      <div class="z-ahub__sidebar-foot">
+        <router-link class="z-ahub__foot-link" to="/" @click="mobileNavOpen = false">
+          <i class="material-icons">storefront</i>
+          {{ t('admin.viewStore') }}
+        </router-link>
+        <router-link class="z-ahub__foot-link" to="/account" @click="mobileNavOpen = false">
+          <i class="material-icons">person</i>
+          {{ t('admin.backAccount') }}
+        </router-link>
+        <button v-if="auth.user" class="z-ahub__foot-link" type="button" @click="onSignOut">
+          <i class="material-icons">logout</i>
+          {{ t('account.signOut') }}
+        </button>
+      </div>
     </aside>
 
-    <main class="main-wrap">
-      <header class="main-header navbar">
-        <div class="col-search">
-          <form class="searchform" @submit.prevent>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search term" list="admin_search_terms" />
-              <button class="btn btn-light bg" type="submit">
-                <i class="material-icons md-search" />
-              </button>
-            </div>
-            <datalist id="admin_search_terms">
-              <option value="Products" />
-              <option value="New orders" />
-              <option value="Sellers" />
-            </datalist>
-          </form>
+    <div class="z-ahub__shell">
+      <header class="z-ahub__bar">
+        <button
+          class="z-ahub__menu"
+          type="button"
+          aria-label="Menu"
+          @click="mobileNavOpen = !mobileNavOpen"
+        >
+          <i class="material-icons">menu</i>
+        </button>
+
+        <div class="z-ahub__bar-title">
+          <span>{{ pageTitle }}</span>
         </div>
-        <div class="col-nav">
-          <button
-            class="btn btn-icon btn-mobile me-auto"
-            type="button"
-            @click="asideOpen = !asideOpen"
-          >
-            <i class="material-icons md-apps" />
-          </button>
-          <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link btn-icon" href="#" @click.prevent>
-                <i class="material-icons md-notifications animation-shake" />
-                <span class="badge rounded-pill">3</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link btn-icon" to="/account" title="Account">
-                <i class="material-icons md-person" />
-              </router-link>
-            </li>
-          </ul>
+
+        <div class="z-ahub__bar-actions">
+          <router-link class="z-ahub__bar-link" to="/">
+            <i class="material-icons">open_in_new</i>
+            <span>{{ t('admin.viewStore') }}</span>
+          </router-link>
         </div>
       </header>
-      <section class="content-main">
+
+      <main class="z-ahub__main">
         <router-view />
-      </section>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import { Notify } from 'quasar';
+import { useAuthStore } from 'stores/auth-store';
 
+const { t } = useI18n();
 const route = useRoute();
-const asideOpen = ref(false);
-const logo = '/ecom-admin/assets/imgs/theme/logo.svg';
+const router = useRouter();
+const auth = useAuthStore();
+const mobileNavOpen = ref(false);
 
-const menu = [
-  { label: 'Dashboard', to: '/admin', icon: 'md-home' },
-  { label: 'Products', to: '/admin/products', icon: 'md-shopping_bag' },
-  { label: 'Categories', to: '/admin/categories', icon: 'md-category' },
-  { label: 'Orders', to: '/admin/orders', icon: 'md-shopping_cart' },
-  { label: 'Sellers', to: '/admin/sellers', icon: 'md-store' },
-  { label: 'Transactions', to: '/admin/transactions', icon: 'md-monetization_on' },
-  { label: 'Settings', to: '/admin/settings', icon: 'md-settings' },
-];
+const userInitial = computed(() => (auth.user?.name?.trim()?.[0] || 'A').toUpperCase());
+
+const roleLabel = computed(() =>
+  auth.isSuperAdmin ? t('admin.roleSuperHint') : t('admin.roleAdminHint'),
+);
+
+const menu = computed(() => {
+  const base = [
+    { to: '/admin', label: t('admin.navDashboard'), icon: 'space_dashboard', badge: 0 },
+    { to: '/admin/orders', label: t('admin.navOrders'), icon: 'receipt_long', badge: 3 },
+    { to: '/admin/sellers', label: t('admin.navVendors'), icon: 'storefront', badge: 1 },
+    { to: '/admin/products', label: t('admin.navProducts'), icon: 'inventory_2', badge: 0 },
+    { to: '/admin/categories', label: t('admin.navCategories'), icon: 'category', badge: 0 },
+    { to: '/admin/transactions', label: t('admin.navTransactions'), icon: 'account_balance_wallet', badge: 0 },
+  ];
+  if (auth.isSuperAdmin) {
+    base.push(
+      { to: '/admin/users', label: t('admin.navUsers'), icon: 'group', badge: 0 },
+      { to: '/admin/fees', label: t('admin.navFees'), icon: 'percent', badge: 0 },
+      { to: '/admin/settings', label: t('admin.navSettings'), icon: 'settings', badge: 0 },
+    );
+  }
+  return base;
+});
+
+const pageTitle = computed(() => {
+  const hit = menu.value.find((item) => isActive(item.to));
+  return hit?.label ?? t('admin.navDashboard');
+});
 
 function isActive(to: string) {
   if (to === '/admin') return route.path === '/admin';
   return route.path.startsWith(to);
 }
 
-const adminCssId = 'ecom-admin-css';
-const storefrontCssId = 'ecom-storefront-css';
-
-onMounted(() => {
-  const storefront = document.getElementById(storefrontCssId) as HTMLLinkElement | null;
-  if (storefront) storefront.disabled = true;
-
-  if (!document.getElementById(adminCssId)) {
-    const link = document.createElement('link');
-    link.id = adminCssId;
-    link.rel = 'stylesheet';
-    link.href = '/ecom-admin/assets/css/style.css';
-    document.head.appendChild(link);
-  }
-  document.body.classList.add('ecom-admin-body');
-});
-
-onUnmounted(() => {
-  document.body.classList.remove('ecom-admin-body');
-  document.getElementById(adminCssId)?.remove();
-  const storefront = document.getElementById(storefrontCssId) as HTMLLinkElement | null;
-  if (storefront) storefront.disabled = false;
-});
+async function onSignOut() {
+  await auth.logout();
+  Notify.create({ type: 'positive', message: t('account.signedOut'), position: 'top' });
+  void router.push('/login');
+}
 </script>
-
-<style>
-.ecom-admin-root {
-  min-height: 100vh;
-  background: #f7f8f9;
-}
-.ecom-admin-body {
-  background: #f7f8f9 !important;
-  margin: 0;
-}
-.ecom-admin-body .screen-overlay.show {
-  display: block;
-  opacity: 0.5;
-}
-</style>
