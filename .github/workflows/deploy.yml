@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # vite-plugin-checker runs vue-tsc + eslint as part of build,
-      # so a type or lint error fails the deploy before anything ships.
+      # vite-plugin-checker runs vue-tsc + eslint as part of build, so a type
+      # or lint error fails the deploy before anything reaches the server.
       - name: Build PWA
         run: npx quasar build -m pwa
 
@@ -38,6 +38,8 @@ jobs:
           test -f dist/pwa/index.html
           test -f dist/pwa/sw.js
           test -f dist/pwa/manifest.json
+          grep -q 'return`production`' dist/pwa/assets/index-*.js \
+            || { echo "FATAL: bundle is not in production API mode (check .env.prod)"; exit 1; }
           echo "Build size: $(du -sh dist/pwa | cut -f1)"
 
       - name: Configure SSH
@@ -53,15 +55,16 @@ jobs:
           if [ -n "$SSH_KNOWN_HOSTS" ]; then
             printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           else
-            # No pinned host key provided: trust on first use.
             ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           fi
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Compute release name
-        run: echo "RELEASE=$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-
-      - name: Upload release
+      # Writes directly into the folder nginx already serves
+      # (root /www/wwwroot/zcomus-front/dist/pwa). No server config is touched.
+      #   --delay-updates : stage new files, then rename them in at the end
+      #   --delete-after  : remove stale files only once the transfer succeeded
+      # Together these keep the swap-over window as short as rsync allows.
+      - name: Deploy to server
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -69,56 +72,17 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           SSH_OPTS="-i $HOME/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes"
-          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" \
-            "mkdir -p '$DEPLOY_PATH/releases/$RELEASE'"
-          rsync -az --delete \
+          TARGET="$DEPLOY_PATH/dist/pwa"
+
+          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" "mkdir -p '$TARGET'"
+
+          rsync -az --delete --delay-updates --delete-after \
             -e "ssh $SSH_OPTS" \
-            dist/pwa/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/releases/$RELEASE/"
+            dist/pwa/ "$SSH_USER@$SSH_HOST:$TARGET/"
 
-      # Symlink swap via `mv -T` is atomic, so nginx never sees a partial site.
-      - name: Activate release
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          KEEP_RELEASES: '5'
-        run: |
-          ssh -i "$HOME/.ssh/id_deploy" -p "$SSH_PORT" \
-            -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" bash -s <<EOF
-          set -euo pipefail
-          cd '$DEPLOY_PATH'
-
-          # nginx runs as the 'www' user on aaPanel; ignore if not permitted.
-          chown -R www:www 'releases/$RELEASE' 2>/dev/null || true
-          find 'releases/$RELEASE' -type d -exec chmod 755 {} + 2>/dev/null || true
-          find 'releases/$RELEASE' -type f -exec chmod 644 {} + 2>/dev/null || true
-
-          # Atomic swap. 'mv -T' needs GNU coreutils; the fallback also recovers
-          # if 'current' was left behind as a real directory instead of a symlink.
-          ln -sfn 'releases/$RELEASE' current.tmp
-          if ! mv -Tf current.tmp current 2>/dev/null; then
-            rm -rf current
-            mv current.tmp current
-          fi
-
-          # Keep the newest N releases so a rollback target always exists.
-          # Sort by NAME, not mtime: names are UTC timestamps, so ordering is
-          # deterministic even when deploys land in the same second. The active
-          # release is skipped explicitly so a prune can never delete live files.
-          ACTIVE=\$(readlink current || true)
-          ls -1d releases/*/ 2>/dev/null | sed 's:/*\$::' | sort -r \\
-            | tail -n +\$(( $KEEP_RELEASES + 1 )) \\
-            | while read -r old; do
-                [ "\$old" = "\$ACTIVE" ] && continue
-                rm -rf "\$old"
-              done
-
-          test -f current/index.html || { echo 'FATAL: current/index.html missing'; exit 1; }
-          echo "Active release: \$(readlink current)"
-          EOF
+          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" \
+            "test -f '$TARGET/index.html' && test -f '$TARGET/sw.js' && echo 'Deploy verified on server'"
 
       - name: Summary
         run: |
-          echo "### Deployed \`$RELEASE\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "Commit: \`${GITHUB_SHA::7}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Deployed \`${GITHUB_SHA::7}\` to dist/pwa" >> "$GITHUB_STEP_SUMMARY"
