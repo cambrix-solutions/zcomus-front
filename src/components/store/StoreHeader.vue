@@ -61,9 +61,37 @@
         </nav>
 
         <div class="z-header__acts">
-          <router-link class="z-header__action" :to="auth.user ? '/account' : '/login'">
+          <div
+            v-if="auth.user"
+            class="z-header__account-wrap"
+            @mouseenter="accountOpen = true"
+            @mouseleave="accountOpen = false"
+          >
+            <button
+              class="z-header__action"
+              type="button"
+              :aria-expanded="accountOpen"
+              aria-haspopup="menu"
+              @click="accountOpen = !accountOpen"
+            >
+              <i class="material-icons">person_outline</i>
+              <span class="label">{{ t('nav.account') }}</span>
+            </button>
+            <div v-if="accountOpen" class="z-account-menu" role="menu">
+              <p class="z-account-menu__hello">{{ auth.user.name }}</p>
+              <router-link role="menuitem" to="/account" @click="accountOpen = false">
+                <i class="material-icons">manage_accounts</i>
+                {{ t('nav.account') }}
+              </router-link>
+              <button role="menuitem" type="button" class="is-signout" @click="onSignOut">
+                <i class="material-icons">logout</i>
+                {{ t('account.signOut') }}
+              </button>
+            </div>
+          </div>
+          <router-link v-else class="z-header__action" to="/login">
             <i class="material-icons">person_outline</i>
-            <span class="label">{{ t('nav.account') }}</span>
+            <span class="label">{{ t('nav.login') }}</span>
           </router-link>
           <router-link class="z-header__action" to="/wishlist">
             <i class="material-icons">favorite_border</i>
@@ -116,7 +144,11 @@
           </div>
 
           <div class="z-drawer__quick">
-            <router-link class="z-drawer__quick-btn" :to="auth.user ? '/account' : '/login'" @click="ui.mobileMenuOpen = false">
+            <router-link
+              class="z-drawer__quick-btn"
+              :to="auth.user ? '/account' : '/login'"
+              @click="ui.mobileMenuOpen = false"
+            >
               <i class="material-icons">person_outline</i>
               <span>{{ auth.user ? t('nav.account') : t('nav.login') }}</span>
             </router-link>
@@ -131,6 +163,16 @@
               <em v-if="cart.count">{{ cart.count }}</em>
             </router-link>
           </div>
+
+          <button
+            v-if="auth.user"
+            class="z-drawer__signout"
+            type="button"
+            @click="onSignOut"
+          >
+            <i class="material-icons">logout</i>
+            {{ t('account.signOut') }}
+          </button>
 
           <p class="z-drawer__label">{{ t('header.mainNav') }}</p>
           <nav class="z-drawer__nav">
@@ -177,6 +219,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { Notify } from 'quasar';
 import PriceDisplay from 'components/store/PriceDisplay.vue';
 import ZcomusMark from 'components/brand/ZcomusMark.vue';
 import { useCartStore } from 'stores/cart-store';
@@ -200,6 +243,7 @@ const prefs = usePrefsStore();
 const query = ref('');
 const category = ref('all');
 const cartOpen = ref(false);
+const accountOpen = ref(false);
 const scrolled = ref(false);
 
 function onScroll() {
@@ -239,6 +283,14 @@ function onSearch() {
       category: category.value === 'all' ? undefined : category.value,
     },
   });
+}
+
+async function onSignOut() {
+  accountOpen.value = false;
+  ui.mobileMenuOpen = false;
+  await auth.logout();
+  Notify.create({ type: 'positive', message: t('account.signedOut'), position: 'top' });
+  void router.push('/');
 }
 
 onMounted(() => {

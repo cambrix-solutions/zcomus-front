@@ -38,7 +38,7 @@ export interface AdminVendorRow {
   orders: number;
 }
 
-export const PLATFORM_FEE_RATE = 0.08;
+export const PLATFORM_FEE_RATE = 0.04;
 
 export const adminKpis: AdminKpi[] = [
   {
@@ -53,7 +53,7 @@ export const adminKpis: AdminKpi[] = [
   {
     id: 'fees',
     labelKey: 'admin.kpiFees',
-    value: '$3,913.60',
+    value: '$1,956.80',
     hintKey: 'admin.kpiFeesHint',
     icon: 'payments',
     tone: 'ok',
@@ -86,7 +86,7 @@ export const adminOrders: AdminOrderRow[] = [
     vendor: 'Phnom Penh Gadgets',
     status: 'paid',
     total: 86.5,
-    fee: 6.92,
+    fee: 3.46,
     payin: 'aba',
     placedAt: '2026-08-25 09:12',
   },
@@ -96,7 +96,7 @@ export const adminOrders: AdminOrderRow[] = [
     vendor: 'Siem Reap Crafts',
     status: 'packed',
     total: 42.0,
-    fee: 3.36,
+    fee: 1.68,
     payin: 'wing',
     placedAt: '2026-08-25 08:41',
   },
@@ -106,7 +106,7 @@ export const adminOrders: AdminOrderRow[] = [
     vendor: 'Battambang Fresh',
     status: 'shipped',
     total: 19.75,
-    fee: 1.58,
+    fee: 0.79,
     payin: 'cod',
     placedAt: '2026-08-24 21:05',
   },
@@ -116,7 +116,7 @@ export const adminOrders: AdminOrderRow[] = [
     vendor: 'Phnom Penh Gadgets',
     status: 'delivered',
     total: 210.0,
-    fee: 16.8,
+    fee: 8.4,
     payin: 'aba',
     placedAt: '2026-08-24 16:22',
   },
@@ -164,7 +164,7 @@ export const adminVendors: AdminVendorRow[] = [
 ];
 
 export const superAdminExtras = {
-  feeRateLabel: '8%',
+  feeRateLabel: '4%',
   staffCount: 3,
   pendingSettlements: '$12,480',
   escrowHeld: '$9,210',

@@ -3,7 +3,11 @@ import type { VendorOrder } from 'src/data/vendor-orders';
 
 export type PayinMethodId = 'aba' | 'wing' | 'cod' | 'card';
 
-export const PLATFORM_FEE_RATE = 0.08;
+/** Platform take-rate on delivered order gross. */
+export const PLATFORM_FEE_RATE = 0.04;
+
+/** Vendor can request a withdraw once available net reaches this amount (USD). */
+export const MIN_WITHDRAW_USD = 10;
 
 export type PaymentLifecycleStep = {
   id: string;
@@ -12,20 +16,12 @@ export type PaymentLifecycleStep = {
   current: boolean;
 };
 
-function nextMondayLabel() {
-  const d = new Date();
-  const day = d.getDay();
-  const daysUntil = day === 0 ? 1 : day === 1 ? 7 : 8 - day;
-  d.setDate(d.getDate() + daysUntil);
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-}
-
 function isDelivered(order: VendorOrder) {
   return order.status === 'Delivered';
 }
 
 function isInTransit(order: VendorOrder) {
-  return order.status === 'New' || order.status === 'Packed';
+  return order.status === 'New' || order.status === 'Packed' || order.status === 'Shipped';
 }
 
 export function useSellerPaymentFlow(orders: Ref<VendorOrder[]>) {
@@ -48,9 +44,12 @@ export function useSellerPaymentFlow(orders: Ref<VendorOrder[]>) {
     Math.round((grossAvailable.value - platformFees.value) * 100) / 100,
   );
 
-  const nextPayoutDate = computed(() => nextMondayLabel());
+  /** True when vendor can click Withdraw (available ≥ minimum). */
+  const canWithdraw = computed(() => netAvailable.value >= MIN_WITHDRAW_USD);
 
-  const canPayout = computed(() => netAvailable.value >= 10);
+  const shortfallToWithdraw = computed(() =>
+    Math.max(0, Math.round((MIN_WITHDRAW_USD - netAvailable.value) * 100) / 100),
+  );
 
   const lifecycleSteps = computed((): PaymentLifecycleStep[] => {
     const hasOrders = orders.value.length > 0;
@@ -73,19 +72,19 @@ export function useSellerPaymentFlow(orders: Ref<VendorOrder[]>) {
         id: 'deliver',
         icon: 'local_shipping',
         done: hasDelivered,
-        current: hasDelivered && grossAvailable.value > 0,
+        current: hasDelivered && !canWithdraw.value && netAvailable.value > 0,
       },
       {
-        id: 'settle',
-        icon: 'event_available',
-        done: hasDelivered && netAvailable.value >= 10,
-        current: hasDelivered && netAvailable.value > 0 && netAvailable.value < 10,
+        id: 'available',
+        icon: 'savings',
+        done: canWithdraw.value,
+        current: hasDelivered && netAvailable.value > 0 && !canWithdraw.value,
       },
       {
-        id: 'payout',
+        id: 'withdraw',
         icon: 'account_balance_wallet',
         done: false,
-        current: canPayout.value,
+        current: canWithdraw.value,
       },
     ];
   });
@@ -119,8 +118,12 @@ export function useSellerPaymentFlow(orders: Ref<VendorOrder[]>) {
     grossAvailable,
     platformFees,
     netAvailable,
-    nextPayoutDate,
-    canPayout,
+    canWithdraw,
+    shortfallToWithdraw,
+    minWithdraw: MIN_WITHDRAW_USD,
+    /** @deprecated use canWithdraw — kept so older call sites compile during rename */
+    canPayout: canWithdraw,
+    nextPayoutDate: computed(() => (canWithdraw.value ? 'Ready' : '—')),
     lifecycleSteps,
     ledgerRows,
   };

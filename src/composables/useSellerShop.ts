@@ -261,7 +261,7 @@ const LIST_KEY = 'zcomus-account-listings';
 const PAYOUT_KEY = 'zcomus-account-payout';
 
 const DEFAULT_COVER = DEFAULT_SHOP_COVER;
-const DEFAULT_ACCENT = '#A6704D';
+const DEFAULT_ACCENT = '#C2410C';
 
 function emptyShop(): SellerShop {
   return {

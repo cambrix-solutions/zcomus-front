@@ -1,5 +1,11 @@
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useSellerShop } from 'src/composables/useSellerShop';
+import { isApiEnabled } from 'src/helper/api/apiConfig';
+import {
+  fetchVendorPaymentSetup,
+  saveVendorPayin,
+  saveVendorPayout,
+} from 'src/helper/api/vendorMoneyApi';
 
 export type PayoutMethodId = 'aba' | 'wing' | 'bank';
 export type PayinSetupId = 'aba' | 'wing' | 'cod';
@@ -192,7 +198,7 @@ export function useSellerPayout() {
     setupTab.value = tab;
   }
 
-  function savePayoutProfile() {
+  async function savePayoutProfile() {
     if (!confirmChecked.value || !detailsValid() || !payinValid.value) return false;
     const payin: PayinSetup = {
       aba: payinDraft.aba,
@@ -207,6 +213,21 @@ export function useSellerPayout() {
       khqrImage: draftMethod.value === 'aba' ? form.khqrImage : '',
       savedAt: new Date().toISOString(),
     };
+
+    if (isApiEnabled()) {
+      try {
+        await saveVendorPayin(payin);
+        await saveVendorPayout({
+          method: profile.method,
+          account_name: profile.accountName,
+          account_ref: profile.accountRef,
+          bank_name: profile.bankName || null,
+        });
+      } catch {
+        return false;
+      }
+    }
+
     localStorage.setItem(PAYIN_KEY, JSON.stringify(payin));
     localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
     localStorage.setItem(METHOD_KEY, profile.method);
@@ -218,6 +239,50 @@ export function useSellerPayout() {
     confirmChecked.value = false;
     return true;
   }
+
+  async function hydrateFromApi() {
+    if (!isApiEnabled()) return;
+    try {
+      const setup = await fetchVendorPaymentSetup();
+      if (!setup) return;
+      const payin: PayinSetup = {
+        aba: setup.payin.aba,
+        wing: setup.payin.wing,
+        cod: setup.payin.cod,
+      };
+      savedPayin.value = payin;
+      Object.assign(payinDraft, payin);
+      localStorage.setItem(PAYIN_KEY, JSON.stringify(payin));
+
+      if (setup.payout.configured && setup.payout.method && setup.payout.account_name && setup.payout.account_ref) {
+        const method = parsePayoutMethodId(setup.payout.method);
+        const profile: PayoutProfile = {
+          method,
+          accountName: setup.payout.account_name,
+          accountRef: setup.payout.account_ref,
+          bankName: setup.payout.bank_name || '',
+          khqrImage: setup.payout.khqr_url || '',
+          savedAt: setup.payout.configured_at || new Date().toISOString(),
+        };
+        savedProfile.value = profile;
+        draftMethod.value = method;
+        form.accountName = profile.accountName;
+        form.accountRef = profile.accountRef;
+        form.bankName = profile.bankName;
+        form.khqrImage = profile.khqrImage;
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        localStorage.setItem(METHOD_KEY, method);
+        setPayout();
+        wizardOpen.value = false;
+      }
+    } catch {
+      // Keep localStorage demo profile when API is unreachable.
+    }
+  }
+
+  onMounted(() => {
+    void hydrateFromApi();
+  });
 
   return {
     savedProfile,
@@ -243,5 +308,6 @@ export function useSellerPayout() {
     prevStep,
     goToSetupTab,
     savePayoutProfile,
+    hydrateFromApi,
   };
 }

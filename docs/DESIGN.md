@@ -6,21 +6,28 @@ Source of truth for tokens is `src/css/zcomus.scss` (`:root`). Quasar's equivale
 
 ## Brand
 
-Three colors only — bronze, cream, espresso. Everything else is derived.
+Three colors only — espresso, ember, warm white. Everything else is a shade of one of them, or a neutral.
 
-| Token | Value | Use |
-|-------|--------|-----|
-| Bronze | `#A6704D` | Primary actions, links, badges, deals, ratings |
-| Bronze dark | `#8C5740` | Hover / pressed states, gradient ends |
-| Cream | `#F9F7F2` | Page background (`--z-paper`) |
-| Espresso | `#2D2A27` | Text (`--z-ink`), hub headers |
-| Warm | `#F1EBE3` | Section washes, alternating bands |
-| Surface | `#FFFFFF` | Cards, header, footer |
-| Muted | `#75706A` | Secondary text |
-| Line | `#E8E4DC` | Borders |
-| Danger | `#8B3A2F` | Destructive actions and errors only |
+| Token | Value | Use | Contrast |
+|-------|--------|-----|----------|
+| Espresso | `#2D2A27` | All text (`--z-ink`), header strip, hub headers | 13.44:1 — AAA |
+| Ember | `#C2410C` | The single accent: links, buttons, badges, deals, prices, ratings | 4.88:1 as text — AA |
+| Ember dark | `#9A3412` | Deals, flash countdowns, sale prices, hover states | — |
+| Ember darkest | `#7C2D12` | Errors (`--z-danger`), destructive actions | — |
+| Ember soft | `#FDECE2` | Badge and alert washes | — |
+| Warm white | `#FFF7F0` | Page background (`--z-paper`) | — |
+| Warm | `#FDF0E7` | Section washes, image wells | — |
+| Surface | `#FFFFFF` | Cards, header, footer | — |
+| Muted | `#7A7269` | Secondary text | — |
+| Line | `#F0E3D8` | Borders | — |
 
-Deal, gold, and primary all resolve to bronze — flash and discount treatments are separated by weight and layout, not by hue. There is no separate red or green accent in the storefront palette.
+Emphasis comes from **fill and shade, not extra hues**: solid ember for a primary button, darker ember for urgency, tinted ember with dark ember text for badges, an ember outline for secondary actions. `--z-deal`, `--z-gold`, and `--z-danger` all resolve into the ember family. There is no separate red, green, or amber.
+
+### Bronze
+
+`#A6704D` was the accent until it was measured: **3.92:1 as text, which fails WCAG AA**, while being used as a text color in 68 places. It is now retained only in the logo artwork (`--z-bronze`, `public/brand/*.svg`, the favicons and PWA icons), where decorative marks are exempt from text-contrast rules. Do not use it for type, icons, or borders.
+
+Vendors may still pick their own storefront accent, including a bronze "Clay" cover preset — that is their branding, not the platform's.
 
 ## Type
 

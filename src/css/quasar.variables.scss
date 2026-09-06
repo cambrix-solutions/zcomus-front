@@ -1,21 +1,32 @@
-// Zcomus brand — cream · bronze · charcoal (marketplace UI)
+// Zcomus — one accent on a neutral ground.
+// Must stay in sync with the :root tokens in zcomus.scss.
+//
+// The greys are neutral, not warm: product photography is mostly cool silver
+// and grey, and a tinted ground fights every photo placed on it.
+//
+// Bronze #A6704D is deliberately absent: it measures 3.92:1 as text, which
+// fails WCAG AA. It survives only in the logo artwork.
 
-$primary   : #A6704D;
-$secondary : #A6704D;
-$accent    : #8B3A2F;
+$primary   : #C2410C; // the single accent — 5.18:1 on white
+$secondary : #9A3412; // one shade deeper: deals and urgency
+$accent    : #C2410C;
 
-$dark      : #2D2A27;
-$dark-page : #2D2A27;
+$dark      : #1F2328;
+$dark-page : #1F2328;
 
-$positive  : #3D8B6E;
-$negative  : #8B3A2F;
-$info      : #A6704D;
-$warning   : #8C5740;
+// Quasar needs these for Notify and validation states. Kept inside the accent
+// family and the neutrals rather than introducing green and red hues.
+$positive  : #1F2328;
+$negative  : #A8321A;
+$info      : #C2410C;
+$warning   : #9A3412;
 
-$ink: #2D2A27;
-$paper: #F9F7F2;
+$ink: #1F2328;
+$paper: #FFFFFF;
+$warm: #F4F5F7;
 $surface: #FFFFFF;
-$muted: #75706A;
-$gold: #A6704D;
-$deal: #A6704D;
+$muted: #6B7280;
+$gold: #C2410C;
+$deal: #9A3412;
+$deal-dark: #7C2D12;
 $font-body: 'Plus Jakarta Sans', 'Kantumruy Pro', sans-serif;

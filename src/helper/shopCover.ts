@@ -4,7 +4,7 @@ export const DEFAULT_SHOP_COVER =
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">' +
       '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" stop-color="#A6704D"/><stop offset="100%" stop-color="#3A322E"/>' +
+      '<stop offset="0%" stop-color="#C2410C"/><stop offset="100%" stop-color="#3A322E"/>' +
       '</linearGradient></defs><rect width="1200" height="420" fill="url(#g)"/></svg>',
   );
 

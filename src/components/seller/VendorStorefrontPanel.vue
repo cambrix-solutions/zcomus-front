@@ -315,7 +315,7 @@ const { t } = useI18n();
 const { shop, listings, listingCount, saveProfile, storeUrl } = useSellerShop();
 
 const DEFAULT_COVER = DEFAULT_SHOP_COVER;
-const accentSwatches = ['#A6704D', '#F9F7F2', '#2D2A27'];
+const accentSwatches = ['#C2410C', '#9A3412', '#2D2A27'];
 
 const coverInput = ref<HTMLInputElement | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
@@ -371,7 +371,7 @@ const previewListings = computed(() => listings.value.filter((l) => l.status ===
 const hasCustomCover = computed(() => isCustomShopCover(draft.cover));
 
 const previewStyle = computed(() => ({
-  '--z-vendor-accent': draft.accentColor || '#A6704D',
+  '--z-vendor-accent': draft.accentColor || '#C2410C',
 }));
 
 const previewVendor = computed((): Vendor => {
@@ -445,9 +445,11 @@ const themeOptions = computed(() => [
   { id: 'bold' as const, label: t('seller.themeBold'), hint: t('seller.themeBoldHint') },
 ]);
 
+// Vendors may brand their own storefront, so these are not limited to the
+// platform's three colours — but the first two lead with them.
 const coverPresets = [
-  { id: 'ocean', label: 'Ocean', css: 'linear-gradient(135deg, #A6704D 0%, #3A322E 100%)', stops: ['#A6704D', '#3A322E'] as [string, string] },
-  { id: 'sunset', label: 'Sunset', css: 'linear-gradient(135deg, #A6704D 0%, #3A322E 100%)', stops: ['#A6704D', '#3A322E'] as [string, string] },
+  { id: 'ember', label: 'Ember', css: 'linear-gradient(135deg, #C2410C 0%, #7C2D12 100%)', stops: ['#C2410C', '#7C2D12'] as [string, string] },
+  { id: 'clay', label: 'Clay', css: 'linear-gradient(135deg, #A6704D 0%, #3A322E 100%)', stops: ['#A6704D', '#3A322E'] as [string, string] },
   { id: 'mint', label: 'Mint', css: 'linear-gradient(135deg, #22c55e 0%, #3A322E 100%)', stops: ['#22c55e', '#3A322E'] as [string, string] },
   { id: 'violet', label: 'Violet', css: 'linear-gradient(135deg, #8b5cf6 0%, #3A322E 100%)', stops: ['#8b5cf6', '#3A322E'] as [string, string] },
   { id: 'rose', label: 'Rose', css: 'linear-gradient(135deg, #ec4899 0%, #3A322E 100%)', stops: ['#ec4899', '#3A322E'] as [string, string] },

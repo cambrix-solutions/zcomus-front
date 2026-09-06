@@ -115,7 +115,7 @@
 }
 
 .z-analytics-chart__col.is-empty .z-analytics-chart__track i {
-  background: #e8edf5;
+  background: var(--z-warm);
   box-shadow: none;
   min-height: 4px;
 }
@@ -330,7 +330,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--z-primary), #7ad4f5);
+  background: linear-gradient(90deg, var(--z-primary), var(--z-primary-dark));
   min-width: 4px;
 }
 
@@ -600,7 +600,7 @@
   width: 100%;
   min-height: 8px;
   border-radius: 10px 10px 4px 4px;
-  background: linear-gradient(180deg, #3ec5f6 0%, #a6704d 100%);
+  background: linear-gradient(180deg, var(--z-primary) 0%, var(--z-primary-dark) 100%);
   box-shadow: 0 4px 12px rgba(166, 112, 77, 0.25);
   transition: height 0.35s ease;
 }

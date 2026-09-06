@@ -83,6 +83,15 @@
   font-size: 1.05rem;
 }
 
+.z-payout-balance__card.is-next .z-btn {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.z-payout-balance--compact .z-payout-balance__card.is-next small {
+  display: block;
+}
+
 /* Education: flow + pay-in */
 .z-payout-education {
   display: grid;

@@ -36,7 +36,7 @@ This document lists all APIs required for the **Vendor Center** SPA (`/vendor`) 
 | Laravel | Only `GET /vendor/dashboard` (Blade stub) + `role=vendor` enum |
 | SPA Vendor Center | Full UX: shop, listings, orders, storefront, analytics, pay-in/payout |
 | Wire-up | **0** vendor REST calls — all localStorage / mocks |
-| Platform fee | Frontend encodes **8%** on delivered orders; must be server truth |
+| Platform fee | Frontend encodes **4%** on delivered orders; must be server truth |
 
 ---
 
@@ -174,7 +174,7 @@ This document lists all APIs required for the **Vendor Center** SPA (`/vendor`) 
 
 `paid` → `packed` → `shipped` → `delivered` (or `cancelled`)
 
-**Note:** Vendors mark **packed** and **shipped**. **Delivered** should be confirmed by platform / courier (unlocks settlement).
+**Note:** Vendors mark **packed** and **shipped**. **Delivered** should be confirmed by platform / courier (moves funds to **available** after the 4% fee).
 
 ### Suggested ship body
 
@@ -281,26 +281,27 @@ For ABA: name + (phone **or** KHQR image) required.
 
 ---
 
-## 12. Balances, ledger & settlements (8% fee)
+## 12. Balances, ledger & withdraws (4% fee)
 
 | # | Method | Endpoint | Auth | Status | Purpose |
 |---|--------|----------|------|--------|---------|
-| 47 | GET | `/api/vendor/balances` | Vendor | **Needed** | Held / available / fees / next payout |
+| 47 | GET | `/api/vendor/balances` | Vendor | **Needed** | Held / available / fees / can_withdraw |
 | 48 | GET | `/api/vendor/ledger` | Vendor | **Needed** | Per-order gross, fee, net, phase |
-| 49 | GET | `/api/vendor/settlements` | Vendor | **Needed** | Weekly settlement batches |
-| 50 | GET | `/api/vendor/settlements/{id}` | Vendor | **Needed** | Batch detail + line items |
-| 51 | — | Internal job | System | **Needed** | Monday settlement runner |
+| 49 | POST | `/api/vendor/withdraw` | Vendor | **Needed** | Request payout of available (≥ $10) |
+| 50 | GET | `/api/vendor/payouts` | Vendor | **Needed** | Withdraw history |
+| 51 | GET | `/api/vendor/payouts/{id}` | Vendor | **Needed** | Single payout detail |
+| 51b | GET | `/api/admin/withdrawals` | Admin | **Needed** | Ops queue of pending withdraws |
 
 ### Platform monetization rules (server must enforce)
 
 | Rule | Value |
 |------|-------|
-| Platform fee | **8%** of delivered order gross |
+| Platform fee | **4%** of delivered order gross |
 | Hold | Funds held until order **delivered** |
 | Available | Delivered orders enter available balance (minus fee) |
-| Minimum payout | **$10** net; below rolls to next cycle |
-| Settlement day | Every **Monday** (prior week delivered) |
-| Payout timing | ABA/Wing ~1–2 days; bank ~2–3 days |
+| Minimum withdraw | **$10** net available |
+| Release model | **Vendor-requested** (no Monday auto-batch) |
+| Payout timing | ABA/Wing ~1–2 days after withdraw; bank ~2–3 days |
 
 ### Suggested balances response
 
@@ -308,11 +309,11 @@ For ABA: name + (phone **or** KHQR image) required.
 {
   "held_gross": 210.0,
   "available_gross": 480.0,
-  "fees_accrued": 38.4,
-  "net_available": 441.6,
-  "min_payout": 10,
-  "next_settlement_at": "2026-09-01",
-  "fee_rate": 0.08
+  "fees_accrued": 19.2,
+  "net_available": 460.8,
+  "min_withdraw": 10,
+  "can_withdraw": true,
+  "fee_rate": 0.04
 }
 ```
 
@@ -342,14 +343,14 @@ Prefer dedicated endpoints in §§5–6 / §11 if simpler for v1.
 3. Listings CRUD + images + status  
 4. Vendor orders list + pack / ship  
 5. Payment setup (pay-in + payout + KHQR)  
-6. Balances + ledger (8% fee)  
+6. Balances + ledger (4% fee)  
 
 ### Phase 2 — Storefront & dashboard
 
 7. Storefront patch + logo/cover + slug check  
 8. Public `GET /api/vendors/{slug}` (+ products)  
 9. Dashboard JSON KPIs + checklist  
-10. Settlements list / detail + Monday job  
+10. Withdraw request + history + admin withdraw queue  
 
 ### Phase 3 — Analytics & polish
 
@@ -397,7 +398,7 @@ Prefer dedicated endpoints in §§5–6 / §11 if simpler for v1.
 5. **Pagination:** `{ data: [], meta: { current_page, last_page, per_page, total } }`  
 6. **Media:** Multipart uploads; store URLs (not base64)  
 7. **Slug:** Unique across platform; validate on change  
-8. **Idempotency:** Pack/ship and settlement jobs must be idempotent  
+8. **Idempotency:** Pack/ship and withdraw requests must be idempotent  
 
 ---
 
@@ -421,7 +422,7 @@ Prefer dedicated endpoints in §§5–6 / §11 if simpler for v1.
 | Dashboard | 1 |
 | Analytics | 4 |
 | Pay-in / payout setup | 6 |
-| Balances / ledger / settlements | 5 |
+| Balances / ledger / withdraws | 5 |
 | Uploads (optional) | 2 |
 | **Total listed** | **~53** |
 

@@ -794,18 +794,32 @@
           <article class="z-payout-balance__card">
             <span>{{ t('seller.balancePending') }}</span>
             <strong>${{ grossPending.toFixed(2) }}</strong>
+            <small>{{ t('seller.balancePendingHint') }}</small>
           </article>
           <article class="z-payout-balance__card is-available">
             <span>{{ t('seller.balanceAvailable') }}</span>
             <strong>${{ netAvailable.toFixed(2) }}</strong>
+            <small>{{ t('seller.balanceAvailableHint') }}</small>
           </article>
           <article class="z-payout-balance__card">
             <span>{{ t('seller.balanceFees') }}</span>
             <strong>${{ platformFees.toFixed(2) }}</strong>
+            <small>{{ t('seller.balanceFeesHint', { rate: feeRateLabel }) }}</small>
           </article>
           <article class="z-payout-balance__card is-next">
-            <span>{{ t('seller.balanceNextPayout') }}</span>
-            <strong>{{ nextPayoutDate }}</strong>
+            <span>{{ t('seller.balanceWithdraw') }}</span>
+            <strong>{{ canWithdraw ? t('seller.balanceWithdrawReady') : t('seller.balanceWithdrawWait') }}</strong>
+            <small v-if="!canWithdraw">
+              {{ t('seller.balanceWithdrawShortfall', { amount: shortfallToWithdraw.toFixed(2) }) }}
+            </small>
+            <button
+              class="z-btn z-btn-primary z-btn--sm"
+              type="button"
+              :disabled="!canWithdraw || !payoutSet"
+              @click="onWithdrawRequest"
+            >
+              {{ t('seller.withdrawNow') }}
+            </button>
           </article>
         </div>
       </div>
@@ -966,7 +980,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { Notify } from 'quasar';
 import { listingCategories, type ListingStatus, type ShopListing, useSellerShop } from 'src/composables/useSellerShop';
 import { useSellerAnalytics } from 'src/composables/useSellerAnalytics';
-import { useSellerPaymentFlow } from 'src/composables/useSellerPaymentFlow';
+import { useVendorMoney } from 'src/composables/useVendorMoney';
 import { listingToSlug } from 'src/data/seller-catalog';
 import { buildVendorOrders, type VendorOrderTone, type VendorPayinMethod } from 'src/data/vendor-orders';
 import { buildOrderProgress, orderVendorAction } from 'src/helper/orderProgress';
@@ -1038,8 +1052,45 @@ const {
   grossPending,
   netAvailable,
   platformFees,
-  nextPayoutDate,
-} = useSellerPaymentFlow(vendorOrders);
+  canWithdraw,
+  shortfallToWithdraw,
+  feeRateLabel,
+  submitWithdraw,
+  refreshBalances,
+} = useVendorMoney(vendorOrders);
+
+async function onWithdrawRequest() {
+  if (!canWithdraw.value || !payoutSet.value) return;
+  try {
+    const result = await submitWithdraw();
+    if (result.demo) {
+      Notify.create({
+        type: 'positive',
+        message: t('seller.withdrawDemo', { amount: result.amount.toFixed(2) }),
+        position: 'top',
+      });
+      return;
+    }
+    Notify.create({
+      type: 'positive',
+      message: t('seller.withdrawQueued', {
+        amount: result.withdrawal.amount.toFixed(2),
+      }),
+      position: 'top',
+    });
+  } catch (e) {
+    Notify.create({
+      type: 'negative',
+      message: e instanceof Error ? e.message : t('seller.withdrawFailed'),
+      position: 'top',
+    });
+  }
+}
+
+function onPayoutSaved() {
+  Notify.create({ type: 'positive', message: t('seller.payoutSaved'), position: 'top' });
+  void refreshBalances();
+}
 
 const {
   totalViews,
@@ -1122,10 +1173,6 @@ const profileDirty = computed(
     profile.phone.trim() !== shop.phone ||
     profile.bio.trim() !== (shop.bio || ''),
 );
-
-function onPayoutSaved() {
-  Notify.create({ type: 'positive', message: t('seller.payoutSaved'), position: 'top' });
-}
 
 const sellerOrders = computed(() =>
   vendorOrders.value.map((order) => {

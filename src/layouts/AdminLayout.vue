@@ -11,17 +11,6 @@
         </div>
       </router-link>
 
-      <div class="z-ahub__user-card">
-        <em>{{ userInitial }}</em>
-        <div>
-          <strong>{{ auth.user?.name || t('admin.staff') }}</strong>
-          <span>{{ roleLabel }}</span>
-        </div>
-        <i class="z-ahub__role-pill" :class="{ 'is-super': auth.isSuperAdmin }">
-          {{ auth.isSuperAdmin ? t('admin.roleSuper') : t('admin.roleAdmin') }}
-        </i>
-      </div>
-
       <nav class="z-ahub__nav" aria-label="Admin navigation">
         <router-link
           v-for="item in menu"
@@ -37,6 +26,10 @@
       </nav>
 
       <div class="z-ahub__sidebar-foot">
+        <div class="z-ahub__session">
+          <strong>{{ auth.user?.name || t('admin.staff') }}</strong>
+          <span>{{ auth.isSuperAdmin ? t('admin.roleSuper') : t('admin.roleAdmin') }}</span>
+        </div>
         <router-link class="z-ahub__foot-link" to="/" @click="mobileNavOpen = false">
           <i class="material-icons">storefront</i>
           {{ t('admin.viewStore') }}
@@ -88,6 +81,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { Notify } from 'quasar';
 import ZcomusMark from 'components/brand/ZcomusMark.vue';
+import { adminNavBadges } from 'src/data/mock-admin-ops';
 import { useAuthStore } from 'stores/auth-store';
 
 const { t } = useI18n();
@@ -96,20 +90,40 @@ const router = useRouter();
 const auth = useAuthStore();
 const mobileNavOpen = ref(false);
 
-const userInitial = computed(() => (auth.user?.name?.trim()?.[0] || 'A').toUpperCase());
-
-const roleLabel = computed(() =>
-  auth.isSuperAdmin ? t('admin.roleSuperHint') : t('admin.roleAdminHint'),
-);
-
 const menu = computed(() => {
   const base = [
     { to: '/admin', label: t('admin.navDashboard'), icon: 'space_dashboard', badge: 0 },
-    { to: '/admin/orders', label: t('admin.navOrders'), icon: 'receipt_long', badge: 3 },
-    { to: '/admin/sellers', label: t('admin.navVendors'), icon: 'storefront', badge: 1 },
-    { to: '/admin/products', label: t('admin.navProducts'), icon: 'inventory_2', badge: 0 },
+    {
+      to: '/admin/orders',
+      label: t('admin.navOrders'),
+      icon: 'receipt_long',
+      badge: adminNavBadges.orders,
+    },
+    {
+      to: '/admin/sellers',
+      label: t('admin.navVendors'),
+      icon: 'storefront',
+      badge: adminNavBadges.vendors,
+    },
+    {
+      to: '/admin/products',
+      label: t('admin.navProducts'),
+      icon: 'inventory_2',
+      badge: adminNavBadges.products,
+    },
     { to: '/admin/categories', label: t('admin.navCategories'), icon: 'category', badge: 0 },
-    { to: '/admin/transactions', label: t('admin.navTransactions'), icon: 'account_balance_wallet', badge: 0 },
+    {
+      to: '/admin/transactions',
+      label: t('admin.navTransactions'),
+      icon: 'account_balance_wallet',
+      badge: adminNavBadges.transactions,
+    },
+    {
+      to: '/admin/withdrawals',
+      label: t('admin.navWithdrawals'),
+      icon: 'payments',
+      badge: adminNavBadges.withdrawals,
+    },
   ];
   if (auth.isSuperAdmin) {
     base.push(

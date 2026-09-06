@@ -55,6 +55,17 @@ export const endpoints = {
   product: (id: string | number) => `/api/products/${id}`,
   cart: '/api/cart',
   cartItem: (productId: string | number) => `/api/cart/${productId}`,
+  vendorBalances: '/api/vendor/balances',
+  vendorLedger: '/api/vendor/ledger',
+  vendorWithdraw: '/api/vendor/withdraw',
+  vendorPayouts: '/api/vendor/payouts',
+  vendorPayout: (id: string | number) => `/api/vendor/payouts/${id}`,
+  vendorPaymentSetup: '/api/vendor/payment-setup',
+  vendorPaymentPayin: '/api/vendor/payment-setup/payin',
+  vendorPaymentPayout: '/api/vendor/payment-setup/payout',
+  vendorPaymentKhqr: '/api/vendor/payment-setup/payout/khqr',
+  adminWithdrawals: '/api/admin/withdrawals',
+  adminWithdrawal: (id: string | number) => `/api/admin/withdrawals/${id}`,
 } as const;
 
 export default API_CONFIG;

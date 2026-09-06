@@ -1,29 +1,57 @@
 :root {
-  /* Brand — match live marketplace look (cream · bronze · charcoal) */
-  --z-bronze: #a6704d;
-  --z-cream: #f9f7f2;
-  --z-espresso: #2d2a27;
+  /*
+   * ONE ACCENT ON A NEUTRAL GROUND.
+   *
+   *   INK     #1F2328  all text and dark surfaces      15.3:1 on white — AAA
+   *   ORANGE  #C2410C  the single accent                 5.18:1 on white — AA
+   *   GROUND  #FFFFFF page · #F4F5F7 sections · #E5E7EB borders
+   *
+   * The greys are deliberately NEUTRAL, not warm. Product photography is mostly
+   * cool silver and grey, and a tinted page fights every photo on it — that is
+   * what made the earlier peach ground look muddy. Warmth now comes only from
+   * the accent, which is the one thing that should draw the eye.
+   *
+   * Emphasis comes from fill and shade: solid orange for a primary button,
+   * darker orange for urgency, tinted orange for badges, an outline for
+   * secondary actions.
+   *
+   * Bronze #A6704D is retained for the logo artwork only. It measures 3.92:1 as
+   * text, which fails WCAG AA, so it must not be used for type or icons.
+   */
+  --z-bronze: #a6704d; /* logo mark only — fails AA as text */
+  --z-espresso: #1f2328;
 
   --z-ink: var(--z-espresso);
-  --z-paper: var(--z-cream);
-  --z-warm: #f1ebe3;
+  --z-paper: #ffffff;
+  /* Cool light grey for section bands and image wells. */
+  --z-warm: #f4f5f7;
   --z-surface: #ffffff;
-  --z-primary: var(--z-bronze);
-  --z-primary-dark: #8c5740;
-  --z-deal: var(--z-bronze);
-  --z-deal-dark: #8c5740;
-  --z-deal-soft: #f4eee7;
-  --z-gold: var(--z-bronze);
-  --z-gold-dark: #8c5740;
-  --z-muted: #75706a;
-  --z-line: #e8e4dc;
-  --z-danger: #8b3a2f;
+
+  /* The accent. One value, because it has to work as button fill AND as type:
+     a brighter orange (#E1580F) measures only 3.75:1 and fails AA for text,
+     and --z-primary is used as a text colour in 68 places. */
+  --z-primary: #c2410c;
+  --z-primary-dark: #9a3412;
+  --z-primary-soft: #fff1e8;
+
+  /* Deals sit one shade deeper than the button so both can appear together. */
+  --z-deal: var(--z-primary-dark);
+  --z-deal-dark: #7c2d12;
+  --z-deal-soft: var(--z-primary-soft);
+
+  --z-gold: var(--z-primary);
+  --z-gold-dark: var(--z-primary-dark);
+  --z-muted: #6b7280;
+  --z-line: #e5e7eb;
+  /* Errors share the accent's darkest shade; the icon and copy carry the
+     meaning, not a separate red. */
+  --z-danger: #a8321a;
   --z-navy: var(--z-espresso);
   --z-radius: 10px;
   --z-font: 'Plus Jakarta Sans', 'Kantumruy Pro', sans-serif;
   --z-header-h: 108px;
-  --z-shadow: 0 6px 20px rgba(45, 42, 39, 0.06);
-  --z-shadow-lg: 0 14px 36px rgba(45, 42, 39, 0.1);
+  --z-shadow: 0 6px 20px rgba(31, 35, 40, 0.07);
+  --z-shadow-lg: 0 14px 36px rgba(31, 35, 40, 0.12);
 }
 
 *,
@@ -217,7 +245,7 @@ ol {
 .z-btn-primary {
   background: var(--z-primary);
   color: #fff;
-  box-shadow: 0 6px 14px rgba(166, 112, 77, 0.28);
+  box-shadow: 0 6px 14px rgba(194, 65, 12, 0.26);
 }
 
 .z-btn-primary:hover {
@@ -227,7 +255,7 @@ ol {
 .z-btn-deal {
   background: linear-gradient(135deg, var(--z-deal) 0%, var(--z-deal-dark) 100%);
   color: #fff;
-  box-shadow: 0 6px 14px rgba(166, 112, 77, 0.3);
+  box-shadow: 0 6px 14px rgba(217, 45, 32, 0.28);
 }
 
 .z-btn-deal:hover {
@@ -339,7 +367,7 @@ ol {
   display: none;
   margin-top: 22px;
   padding-top: 16px;
-  border-top: 1px dashed #e6ddd4;
+  border-top: 1px dashed var(--z-line);
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
@@ -490,7 +518,7 @@ ol {
 
   .z-auth-panel {
     border-bottom: 0;
-    border-right: 1px solid #e6ddd4;
+    border-right: 1px solid var(--z-line);
     padding: 36px 32px;
     display: flex;
     flex-direction: column;
@@ -630,7 +658,7 @@ ol {
   padding: 2px 8px;
   font-size: 0.72rem;
   font-weight: 700;
-  background: var(--z-bronze);
+  background: var(--z-primary);
   color: #fff;
 }
 
@@ -661,6 +689,13 @@ ol {
   color: var(--z-ink);
 }
 
+/* A price is only red when it is actually a discount — that is, when a struck
+   through original sits beside it. Colouring every price red would make the
+   signal meaningless. */
+.z-price:has(.z-price__was) .z-price__main {
+  color: var(--z-deal);
+}
+
 .z-pdp__price .z-price__main {
   font-size: 1.55rem;
   color: var(--z-deal-dark);
@@ -680,7 +715,7 @@ ol {
 }
 
 .z-stars {
-  color: var(--z-deal);
+  color: var(--z-primary);
   font-size: 0.78rem;
   letter-spacing: 1px;
   line-height: 1;
@@ -981,7 +1016,7 @@ ol {
   background:
     radial-gradient(circle at 100% 0%, rgba(166, 112, 77, 0.1), transparent 42%),
     linear-gradient(180deg, #ffffff 0%, var(--z-deal-soft) 100%);
-  border: 1px solid color-mix(in srgb, var(--z-bronze) 22%, white);
+  border: 1px solid color-mix(in srgb, var(--z-primary) 22%, white);
   border-radius: 18px;
   padding: 24px 18px 26px;
   margin-top: 48px;
@@ -989,7 +1024,7 @@ ol {
 }
 
 .z-deal-section .z-section-head {
-  border-bottom-color: color-mix(in srgb, var(--z-bronze) 22%, white);
+  border-bottom-color: color-mix(in srgb, var(--z-primary) 22%, white);
 }
 
 .z-deal-section .z-section-head h2 {
@@ -1269,7 +1304,7 @@ ol {
 
 .z-page-hero.deal {
   background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
 }
 
 .z-page-hero.shop {
@@ -1411,7 +1446,7 @@ ol {
 
 .z-cat-tile:hover {
   transform: translateY(-4px);
-  border-color: var(--z-bronze);
+  border-color: var(--z-primary);
   box-shadow: 0 12px 26px rgba(45, 42, 39, 0.1);
 }
 
@@ -1472,7 +1507,7 @@ ol {
 }
 
 .z-cat-card:hover {
-  border-color: #a6704d;
+  border-color: var(--z-primary);
   transform: translateY(-3px);
   box-shadow: var(--z-shadow);
 }
@@ -1609,7 +1644,7 @@ ol {
     radial-gradient(circle at 100% 0%, rgba(166, 112, 77, 0.22), transparent 42%),
     radial-gradient(circle at 0% 100%, rgba(166, 112, 77, 0.12), transparent 45%),
     linear-gradient(135deg, #ffffff 0%, #ffffff 48%, #ffffff 100%);
-  border: 1px solid #e6ddd4;
+  border: 1px solid var(--z-line);
   border-radius: 12px;
   padding: 26px 28px;
   margin-bottom: 18px;
@@ -2186,7 +2221,7 @@ ol {
   margin-bottom: 18px;
   padding: 20px 22px;
   border-radius: 14px;
-  border: 1px solid #e6ddd4;
+  border: 1px solid var(--z-line);
   background:
     radial-gradient(circle at 100% 0%, rgba(166, 112, 77, 0.18), transparent 42%),
     linear-gradient(135deg, #ffffff 0%, #fff 55%, #ffffff 100%);
@@ -2238,7 +2273,7 @@ ol {
 }
 
 .z-account-stat:hover {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   transform: translateY(-1px);
 }
 
@@ -2561,6 +2596,18 @@ ol {
   margin-top: 4px;
 }
 
+.z-account-settings__signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--z-deal);
+  border-color: rgba(194, 65, 12, 0.28);
+}
+
+.z-account-settings__signout .material-icons {
+  font-size: 1.1rem;
+}
+
 .z-account-settings__section {
   margin: 18px 0 10px;
   font-size: 0.92rem;
@@ -2594,8 +2641,8 @@ ol {
   margin-bottom: 16px;
   padding: 16px 18px;
   border-radius: 12px;
-  border: 1px solid #e6ddd4;
-  background: linear-gradient(120deg, #3a322e 0%, #1a3a6e 55%, #a6704d 140%);
+  border: 1px solid var(--z-line);
+  background: linear-gradient(120deg, var(--z-ink) 0%, #3a3f47 55%, var(--z-primary) 140%);
   color: #fff;
 }
 
@@ -2612,11 +2659,11 @@ ol {
 }
 
 .z-account-sell .z-page-hero__kicker {
-  color: #a6704d;
+  color: var(--z-primary);
 }
 
 .z-account-sell.is-active {
-  background: linear-gradient(120deg, #3a322e 0%, #134a3a 100%);
+  background: linear-gradient(120deg, var(--z-ink) 0%, var(--z-deal-dark) 100%);
   border-color: #9fd9b8;
 }
 
@@ -2687,7 +2734,7 @@ ol {
   align-items: center;
   padding: 14px;
   background: #fff;
-  border: 1px dashed #e6ddd4;
+  border: 1px dashed var(--z-line);
   border-radius: 12px;
 }
 
@@ -2741,7 +2788,7 @@ ol {
 }
 
 .z-account-pay.is-active {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #fffaf6;
 }
 
@@ -2767,7 +2814,7 @@ ol {
 }
 
 .z-account-address.is-default {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   box-shadow: 0 0 0 1px rgba(166, 112, 77, 0.12);
 }
 
@@ -2909,7 +2956,7 @@ ol {
   padding: 14px;
   border-radius: 12px;
   background: #fffaf6;
-  border: 1px solid #e6ddd4;
+  border: 1px solid var(--z-line);
 }
 
 .z-account-next h4 {
@@ -3152,7 +3199,7 @@ ol {
   margin-top: 1px;
   font-size: 0.65rem;
   font-weight: 700;
-  color: #a6704d;
+  color: var(--z-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -3409,7 +3456,7 @@ ol {
 }
 
 .z-seller-alert.is-setup {
-  background: #f4eee7;
+  background: var(--z-warm);
   border-color: #b8e4f5;
 }
 
@@ -4114,7 +4161,7 @@ ol {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a6704d;
+  color: var(--z-primary);
 }
 
 .z-seller-brand h1 {
@@ -4233,7 +4280,7 @@ ol {
 }
 
 .z-vendor-setup__steps button.is-active {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #fff7f2;
   color: var(--z-ink);
 }
@@ -4447,11 +4494,11 @@ ol {
 }
 
 .z-seller-cat:hover {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
 }
 
 .z-seller-cat.is-active {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #ffffff;
   color: var(--z-deal);
 }
@@ -4475,7 +4522,7 @@ ol {
 }
 
 .z-seller-onboard__side {
-  background: linear-gradient(160deg, #3a322e 0%, #524840 100%);
+  background: linear-gradient(160deg, var(--z-ink) 0%, #3a3f47 100%);
   color: #fff;
   border-radius: 14px;
   padding: 20px;
@@ -4504,7 +4551,7 @@ ol {
 }
 
 .z-seller-onboard__side .material-icons {
-  color: #a6704d;
+  color: var(--z-primary);
 }
 
 .z-seller-shell {
@@ -4604,7 +4651,7 @@ ol {
 
 .z-seller-rail__nav button.is-active,
 .z-seller-rail__nav button:hover {
-  background: #3a322e;
+  background: var(--z-ink);
   color: #fff;
 }
 
@@ -4667,7 +4714,7 @@ ol {
 }
 
 .z-seller-setup {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: linear-gradient(180deg, #fffaf6, #fff);
 }
 
@@ -4774,7 +4821,7 @@ ol {
 }
 
 .z-seller-shortcut-grid button:hover {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #fffaf6;
 }
 
@@ -4975,7 +5022,7 @@ ol {
 
 .z-seller-compose {
   margin-bottom: 14px;
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: linear-gradient(180deg, #fffaf6, #fff);
   max-width: 640px;
 }
@@ -5280,7 +5327,7 @@ ol {
   width: 112px;
   height: 112px;
   border-radius: 14px;
-  border: 1px dashed #e6ddd4;
+  border: 1px dashed var(--z-line);
   background: #fffaf6;
   display: grid;
   place-items: center;
@@ -5448,7 +5495,7 @@ ol {
 .z-seller-bars span {
   flex: 1;
   border-radius: 8px 8px 3px 3px;
-  background: linear-gradient(180deg, #a6704d, #7ad4f5);
+  background: linear-gradient(180deg, var(--z-primary), var(--z-primary-dark));
   min-height: 12px;
 }
 
@@ -5499,7 +5546,7 @@ ol {
 }
 
 .z-seller-pay.is-active {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #fffaf6;
 }
 
@@ -5822,7 +5869,7 @@ ol {
 .z-header__pref {
   border: 0;
   background: transparent;
-  color: #3a322e;
+  color: var(--z-ink);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 7px;
@@ -5901,7 +5948,7 @@ ol {
 
 .z-chip--hot {
   background: var(--z-deal-soft);
-  border-color: color-mix(in srgb, var(--z-bronze) 28%, white);
+  border-color: color-mix(in srgb, var(--z-primary) 28%, white);
   color: var(--z-deal-dark);
 }
 
@@ -6390,6 +6437,102 @@ ol {
   z-index: 20;
 }
 
+.z-header__account-wrap {
+  position: relative;
+}
+
+.z-header__account-wrap .z-header__action {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.z-account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% - 2px);
+  min-width: 200px;
+  padding: 8px;
+  background: var(--z-surface);
+  border: 1px solid var(--z-line);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(31, 35, 40, 0.12);
+  z-index: 30;
+}
+
+.z-account-menu__hello {
+  margin: 0 0 6px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--z-line);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--z-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.z-account-menu a,
+.z-account-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--z-ink);
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.z-account-menu a:hover,
+.z-account-menu button:hover {
+  background: var(--z-warm);
+}
+
+.z-account-menu .material-icons {
+  font-size: 1.15rem;
+  color: var(--z-muted);
+}
+
+.z-account-menu button.is-signout {
+  color: var(--z-deal);
+}
+
+.z-account-menu button.is-signout .material-icons {
+  color: var(--z-deal);
+}
+
+.z-drawer__signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 12px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(194, 65, 12, 0.25);
+  border-radius: 12px;
+  background: rgba(194, 65, 12, 0.06);
+  color: var(--z-deal);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.z-drawer__signout .material-icons {
+  font-size: 1.2rem;
+}
+
 .z-mini-cart__item {
   display: grid;
   grid-template-columns: 52px 1fr;
@@ -6408,7 +6551,7 @@ ol {
 .z-footer {
   background:
     radial-gradient(circle at 15% 0%, rgba(166, 112, 77, 0.14), transparent 40%),
-    linear-gradient(160deg, #3a322e 0%, #2f2a27 55%, #5a524c 100%);
+    linear-gradient(160deg, var(--z-ink) 0%, #2f2a27 55%, #5a524c 100%);
   color: #ece8e0;
   padding: 48px 0 22px;
   margin-top: 56px;
@@ -6509,7 +6652,7 @@ ol {
 
 .z-pcard:hover {
   transform: translateY(-5px);
-  border-color: #a6704d;
+  border-color: var(--z-primary);
   box-shadow: 0 14px 32px rgba(58, 50, 46, 0.12);
 }
 
@@ -6563,7 +6706,7 @@ ol {
 }
 
 .z-pcard__wish:hover {
-  color: var(--z-bronze);
+  color: var(--z-primary);
   transform: scale(1.08);
 }
 
@@ -6572,7 +6715,7 @@ ol {
 }
 
 .z-pcard__wish.is-on {
-  color: var(--z-bronze);
+  color: var(--z-primary);
   background: var(--z-deal-soft);
 }
 
@@ -6685,7 +6828,7 @@ ol {
 }
 
 .z-pcard.is-deal {
-  border-color: color-mix(in srgb, var(--z-bronze) 28%, white);
+  border-color: color-mix(in srgb, var(--z-primary) 28%, white);
 }
 
 .z-pcard__flash {
@@ -6705,7 +6848,7 @@ ol {
   justify-content: center;
   align-items: center;
   padding: 7px 8px;
-  background: var(--z-bronze);
+  background: var(--z-primary);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -6756,10 +6899,9 @@ ol {
   transition: transform 0.35s ease;
 }
 
-/* Warm-tint cool product plate photos so they match cream/bronze UI */
-.z-hero-banners__side-card img {
-  filter: sepia(0.22) saturate(0.78) brightness(1.03) hue-rotate(-8deg);
-}
+/* No tint filter here on purpose. The ground is neutral now, so product photos
+   are shown as shot — sepia-shifting them to match a cream UI was what made
+   them look muddy and washed out. */
 
 .z-hero-banners__main:hover img,
 .z-hero-banners__side-card:hover img {
@@ -6773,14 +6915,13 @@ ol {
   flex-direction: column;
   justify-content: flex-end;
   padding: 28px 24px;
-  background: linear-gradient(180deg, rgba(45, 42, 39, 0.04) 18%, rgba(45, 42, 39, 0.62) 100%);
+  background: linear-gradient(180deg, rgba(31, 35, 40, 0.05) 18%, rgba(31, 35, 40, 0.68) 100%);
   z-index: 1;
 }
 
+/* Neutral scrim only. A bronze wash over the photo tinted the product itself. */
 .z-hero-banners__side-card .z-hero-banners__overlay {
-  background:
-    linear-gradient(180deg, rgba(249, 247, 242, 0.28) 0%, rgba(45, 42, 39, 0.58) 100%),
-    linear-gradient(135deg, rgba(166, 112, 77, 0.18), transparent 55%);
+  background: linear-gradient(180deg, rgba(31, 35, 40, 0.1) 0%, rgba(31, 35, 40, 0.72) 100%);
 }
 
 .z-hero-banners__overlay--sm {
@@ -6811,7 +6952,7 @@ ol {
 .z-hero-banners__side-card {
   flex: 1;
   min-height: 0;
-  background: linear-gradient(160deg, #f1ebe3, #e2d5c6);
+  background: linear-gradient(160deg, var(--z-warm), #e3e6ea);
 }
 
 .z-hero-banners__side h3 {
@@ -6838,13 +6979,13 @@ ol {
 }
 
 .z-hero-banners__tag--deal {
-  background: var(--z-bronze);
+  background: var(--z-deal);
   color: #fff;
 }
 
 .z-hero-banners__tag--gold {
   background: rgba(255, 255, 255, 0.92);
-  color: var(--z-bronze);
+  color: var(--z-primary);
 }
 
 @media (max-width: 768px) {
@@ -6881,7 +7022,7 @@ ol {
 
 .z-vendor-card:hover {
   transform: translateY(-4px);
-  border-color: #a6704d;
+  border-color: var(--z-primary);
   box-shadow: 0 14px 30px rgba(58, 50, 46, 0.12);
 }
 
@@ -7031,7 +7172,7 @@ ol {
 }
 
 .z-pdp-bundle__item:hover {
-  border-color: #a6704d;
+  border-color: var(--z-primary);
 }
 
 .z-pdp-review {
@@ -7091,7 +7232,7 @@ ol {
 }
 
 .z-swatch:hover {
-  border-color: #a6704d;
+  border-color: var(--z-primary);
 }
 
 .z-swatch.is-active {
@@ -7238,7 +7379,7 @@ ol {
 
 .z-contact-quick__item:hover {
   transform: translateY(-2px);
-  border-color: #a6704d;
+  border-color: var(--z-primary);
   box-shadow: var(--z-shadow);
 }
 
@@ -7379,7 +7520,7 @@ ol {
 
 .z-contact-pickup:hover,
 .z-contact-pickup.is-open {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #ffffff;
 }
 
@@ -7410,7 +7551,7 @@ ol {
   gap: 4px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed #e6ddd4;
+  border-top: 1px dashed var(--z-line);
   color: var(--z-navy);
   font-size: 0.88rem;
   animation: z-fade-in 0.18s ease;
@@ -7430,7 +7571,7 @@ ol {
   margin-bottom: 20px;
   padding: 22px 24px;
   border-radius: 14px;
-  border: 1px solid #e6ddd4;
+  border: 1px solid var(--z-line);
   background:
     radial-gradient(circle at 100% 0%, rgba(166, 112, 77, 0.18), transparent 42%),
     linear-gradient(135deg, #ffffff 0%, #fff 55%, #ffffff 100%);
@@ -7527,7 +7668,7 @@ ol {
 
 .z-vendor-industries button.is-active {
   background: #ffffff;
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   color: var(--z-deal);
 }
 
@@ -7861,7 +8002,7 @@ ol {
 
 .z-storefront-score__ring-track {
   fill: none;
-  stroke: #e8edf5;
+  stroke: var(--z-line);
   stroke-width: 3;
 }
 
@@ -7904,7 +8045,7 @@ ol {
 .z-storefront-score__bar {
   height: 8px;
   border-radius: 999px;
-  background: #e8edf5;
+  background: var(--z-warm);
   overflow: hidden;
   margin-bottom: 12px;
 }
@@ -8224,12 +8365,12 @@ ol {
   display: block;
   height: 36px;
   border-radius: 6px;
-  background: linear-gradient(180deg, #f1ebe3 45%, #fff 45%);
-  border: 1px solid #e8edf5;
+  background: linear-gradient(180deg, var(--z-warm) 45%, #fff 45%);
+  border: 1px solid var(--z-line);
 }
 
 .z-storefront-theme.is-minimal .z-storefront-theme__mock {
-  background: linear-gradient(180deg, #f1ebe3 28%, #fff 28%);
+  background: linear-gradient(180deg, var(--z-warm) 28%, #fff 28%);
 }
 
 .z-storefront-theme.is-bold .z-storefront-theme__mock {
@@ -8439,7 +8580,7 @@ ol {
   margin-bottom: 18px;
   padding: 22px 24px;
   border-radius: 14px;
-  border: 1px solid #e6ddd4;
+  border: 1px solid var(--z-line);
   background:
     radial-gradient(circle at 100% 0%, rgba(166, 112, 77, 0.2), transparent 42%),
     linear-gradient(135deg, #ffffff 0%, #fff 52%, #ffffff 100%);
@@ -8530,7 +8671,7 @@ ol {
 }
 
 .z-blog-topics button:hover {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   color: var(--z-deal);
 }
 
@@ -8621,7 +8762,7 @@ ol {
 
 .z-blog-card:hover {
   transform: translateY(-3px);
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   box-shadow: 0 12px 24px rgba(58, 50, 46, 0.08);
 }
 
@@ -9761,7 +9902,7 @@ ol {
 }
 
 .z-seller-studio__drawer button.is-active {
-  background: #f4eee7;
+  background: var(--z-warm);
   color: var(--z-primary-dark);
 }
 
@@ -9939,7 +10080,7 @@ ol {
 }
 
 .z-studio-checklist__items button.is-warn {
-  border-color: #e6ddd4;
+  border-color: var(--z-line);
   background: #fff7f2;
 }
 
@@ -10010,7 +10151,7 @@ ol {
 .z-studio-hero__tile {
   border-radius: 16px;
   overflow: hidden;
-  background: #f4eee7;
+  background: var(--z-warm);
   display: grid;
   place-items: center;
   color: var(--z-primary);
@@ -10041,7 +10182,7 @@ ol {
 }
 
 .z-studio-banner.is-setup {
-  background: #f4eee7;
+  background: var(--z-warm);
   border-color: #b8e4f5;
 }
 
@@ -10231,7 +10372,7 @@ ol {
 
 .z-studio-mini-grid__img {
   aspect-ratio: 1.2;
-  background: #f4eee7;
+  background: var(--z-warm);
   display: grid;
   place-items: center;
   overflow: hidden;

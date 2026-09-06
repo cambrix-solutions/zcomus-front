@@ -385,7 +385,10 @@
 
               <div class="z-account-settings__actions">
                 <button class="z-btn z-btn-deal" type="button" @click="onSaveProfile">{{ t('account.save') }}</button>
-                <button class="z-btn z-btn-ghost" type="button" @click="onLogout">{{ t('account.signOut') }}</button>
+                <button class="z-btn z-btn-ghost z-account-settings__signout" type="button" @click="onLogout">
+                  <i class="material-icons">logout</i>
+                  {{ t('account.signOut') }}
+                </button>
               </div>
             </template>
             <template v-else>
@@ -657,6 +660,7 @@ function onSaveProfile() {
 }
 async function onLogout() {
   await auth.logout();
-  void router.push('/login');
+  Notify.create({ type: 'positive', message: t('account.signedOut'), position: 'top' });
+  void router.push('/');
 }
 </script>

@@ -570,7 +570,13 @@ const moneyFlowSteps = computed(() => {
       current: detailsValid() && onPayout,
     },
     {
-      id: 'payout',
+      id: 'available',
+      icon: 'savings',
+      done: detailsValid() && onReview,
+      current: onReview && detailsValid() && !isConfigured.value,
+    },
+    {
+      id: 'withdraw',
       icon: 'account_balance_wallet',
       done: isConfigured.value,
       current: onReview && detailsValid(),
@@ -582,7 +588,8 @@ const moneyFlowStepsComplete = [
   { id: 'payin', icon: 'shopping_cart_checkout' },
   { id: 'hold', icon: 'hourglass_top' },
   { id: 'deliver', icon: 'local_shipping' },
-  { id: 'payout', icon: 'account_balance_wallet' },
+  { id: 'available', icon: 'savings' },
+  { id: 'withdraw', icon: 'account_balance_wallet' },
 ] as const;
 
 const stepChecklist = computed(() => {
@@ -772,7 +779,7 @@ function payinIcon(id: PayinSetupId) {
   return icons[id];
 }
 
-function onSave() {
-  if (savePayoutProfile()) emit('saved');
+async function onSave() {
+  if (await savePayoutProfile()) emit('saved');
 }
 </script>
